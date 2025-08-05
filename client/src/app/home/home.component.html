@@ -1,0 +1,52 @@
+<div class="container-fluid">
+    <!-- Hero Section -->
+    <section class="hero-section bg-primary text-white py-5">
+      <div class="container text-center">
+        <h1 class="display-4">Track Your Investments</h1>
+        <p class="lead">Monitor stocks, ETFs, and build your portfolio</p>
+        <button class="btn btn-light btn-lg" routerLink="/stocks" routerLinkActive="active">Get Started</button>
+      </div>
+    </section>
+  
+    <!-- Market Overview -->
+    <section class="py-4">
+      <div class="container">
+        <h2>Market Overview</h2>
+        <div class="row">
+         <!-- stocks  -->
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5>S&P 500</h5>
+                <p class="text-success">+1.2%</p>
+              </div>
+            </div>
+          </div>
+          <!-- Add more market indicators -->
+        </div>
+      </div>
+    </section>
+  
+    <!-- Quick Actions -->
+    <section class="py-4 bg-light">
+      <div class="container">
+        <div class="row text-center">
+          <div class="col-md-4">
+            <i class="bi bi-graph-up fs-1 text-primary"></i>
+            <h4>Browse Stocks</h4>
+            <button class="btn btn-primary" routerLink="/stocks">View Stocks</button>
+          </div>
+          <div class="col-md-4">
+            <i class="bi bi-collection fs-1 text-success"></i>
+            <h4>Explore ETFs</h4>
+            <button class="btn btn-success" routerLink="/etfs">View ETFs</button>
+          </div>
+          <div class="col-md-4">
+            <i class="bi bi-newspaper fs-1 text-info"></i>
+            <h4>Latest News</h4>
+            <button class="btn btn-info" routerLink="/news">Read News</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
