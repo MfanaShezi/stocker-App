@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities;
 
-public class User: IdentityUser
+public class User: IdentityUser<int>
 {
    // public int Id { get; set; }
     //public required string Username { get; set; }

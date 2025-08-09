@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
-public class DataContext :IdentityDbContext<User>
+public class DataContext(DbContextOptions<DataContext> options) : IdentityDbContext<User,IdentityRole<int>, int>(options)
 {
-    public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+    //public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
     public DbSet<WatchList> WatchLists { get; set; }
     public DbSet<Stock> Stocks { get; set; }
@@ -17,6 +17,10 @@ public class DataContext :IdentityDbContext<User>
     public DbSet<StockNews> StockNews { get; set; }
     public DbSet<StockDividend> StockDividends { get; set; } 
     public DbSet<GeneralNews> GeneralNews { get; set; }
+    
+       // forum entities
+    public DbSet<ForumThread> ForumThreads { get; set; }
+    public DbSet<ForumMessage> ForumMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -76,19 +80,45 @@ public class DataContext :IdentityDbContext<User>
             .HasForeignKey(d => d.StockId)
             .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure GeneralNews entity
-    modelBuilder.Entity<GeneralNews>(entity =>
-    {
-        entity.HasKey(gn => gn.Id); // Primary key
-        entity.Property(gn => gn.Title)
-            .IsRequired()
-            .HasMaxLength(255); // Title is required and has a max length
-        entity.Property(gn => gn.url)
-            .IsRequired()
-            .HasMaxLength(500); // Link is required and has a max length
-        entity.Property(gn => gn.PublishDate)
-            .IsRequired(); // Published date is required
-      
-    });
+        // Configure GeneralNews entity
+        modelBuilder.Entity<GeneralNews>(entity =>
+        {
+            entity.HasKey(gn => gn.Id); // Primary key
+            entity.Property(gn => gn.Title)
+                .IsRequired()
+                .HasMaxLength(255); // Title is required and has a max length
+            entity.Property(gn => gn.url)
+                .IsRequired()
+                .HasMaxLength(500); // Link is required and has a max length
+            entity.Property(gn => gn.PublishDate)
+                .IsRequired(); // Published date is required
+
+        });
+
+        //forum relationships
+
+        modelBuilder.Entity<ForumThread>()
+           .HasOne(ft => ft.User)
+           .WithMany()
+           .HasForeignKey(ft => ft.CreatedBy)
+           .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ForumThread>()
+            .HasMany(ft => ft.Messages)
+            .WithOne(fm => fm.Thread)
+            .HasForeignKey(fm => fm.ThreadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ForumMessage>()
+           .HasOne(fm => fm.User)
+           .WithMany()
+           .HasForeignKey(fm => fm.UserId)
+           .OnDelete(DeleteBehavior.Restrict);
+            
+        modelBuilder.Entity<ForumMessage>()
+            .HasOne(fm => fm.Thread)
+            .WithMany(ft => ft.Messages)
+            .HasForeignKey(fm => fm.ThreadId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -504,7 +504,7 @@ namespace API.Data
         // Method with parallel processing for even better performance
         public async Task FetchAndStoreStockDataParallel()
         {
-            var stocks = await _context.Stocks.Take(10).OrderBy(x => x.Id).ToListAsync(); // Fetch the first 100 stocks
+            var stocks = await _context.Stocks.Take(200).OrderBy(x => x.Id).ToListAsync(); // Fetch the first 100 stocks
             var semaphore = new SemaphoreSlim(6); // Limit concurrent operations to 5
   
             var allStockPrices = new ConcurrentBag<StockPrice>();
@@ -714,7 +714,7 @@ namespace API.Data
             for (int i = 0; i < users.Count; i++)
             {
                 var user = users[i];
-                var userEntity = await userManager.FindByIdAsync(user.Id);
+                var userEntity = await userManager.FindByIdAsync(user.Id.ToString());
 
                 if (userEntity != null)
                 {
