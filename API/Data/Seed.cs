@@ -53,7 +53,7 @@ namespace API.Data
                         Symbol = asset.Symbol,
                         Exchange = asset.Exchange.ToString(),
                         isETF = asset.Name.Contains("ETF") || asset.Name.Contains("Exchange-Traded Fund") ? true : false,
-                    
+
                     });
 
                 }
@@ -71,57 +71,57 @@ namespace API.Data
             try
             {
 
-                
-                    // Read API Key and Base URL from appsettings.json
-                    var apiKey = _configuration["MarketauxSettings:ApiKey"];
-                    var baseUrl = _configuration["MarketauxSettings:BaseUrl"];
 
-                    // Construct the full API URL
-                    var apiUrl = $"{baseUrl}&api_token={apiKey}";
+                // Read API Key and Base URL from appsettings.json
+                var apiKey = _configuration["MarketauxSettings:ApiKey"];
+                var baseUrl = _configuration["MarketauxSettings:BaseUrl"];
 
-                    using var httpClient = new HttpClient();
-                    var response = await httpClient.GetAsync(apiUrl);
+                // Construct the full API URL
+                var apiUrl = $"{baseUrl}&api_token={apiKey}";
 
-                    if (response.IsSuccessStatusCode)
+                using var httpClient = new HttpClient();
+                var response = await httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                    // Deserialize the JSON response
+                    var newsData = JsonSerializer.Deserialize<MarketauxNewsResponse>(jsonResponse, new JsonSerializerOptions
                     {
-                        var jsonResponse = await response.Content.ReadAsStringAsync();
+                        PropertyNameCaseInsensitive = true
+                    });
 
-                        // Deserialize the JSON response
-                        var newsData = JsonSerializer.Deserialize<MarketauxNewsResponse>(jsonResponse, new JsonSerializerOptions
+                    if (newsData != null && newsData.Data != null)
+                    {
+                        foreach (var article in newsData.Data)
                         {
-                            PropertyNameCaseInsensitive = true
-                        });
+                            // Add news to the database
 
-                        if (newsData != null && newsData.Data != null)
-                        {
-                            foreach (var article in newsData.Data)
+                            // if(!generalNews.Any(news => news.Title == article.Title))
+                            // {
+                            generalNews.Add(new GeneralNews
                             {
-                                // Add news to the database
+                                Title = article.Title!,
+                                Content = article.description!,
+                                url = article.url!,
+                                PublishDate = article.published_at?.ToUniversalTime() ?? DateTime.UtcNow,
+                                Source = article.source!
+                            });
+                            // }
 
-                                // if(!generalNews.Any(news => news.Title == article.Title))
-                                // {
-                                    generalNews.Add(new GeneralNews
-                                    {
-                                        Title = article.Title!,
-                                        Content = article.description!,
-                                        url = article.url!,
-                                        PublishDate = article.published_at?.ToUniversalTime() ?? DateTime.UtcNow,
-                                        Source = article.source!
-                                    });
-                                // }
-                            
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("No news data found.");
                         }
                     }
                     else
                     {
-                        Console.WriteLine($"Failed to fetch news data. Status Code: {response.StatusCode}");
+                        Console.WriteLine("No news data found.");
                     }
-                
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to fetch news data. Status Code: {response.StatusCode}");
+                }
+
                 // Add all news to the context
                 _context.GeneralNews.AddRange(generalNews);
 
@@ -445,7 +445,7 @@ namespace API.Data
         }
 
         // Alternative method using batching 
-        public async Task FetchAndStoreStockDataWithBatching()  
+        public async Task FetchAndStoreStockDataWithBatching()
         {
             var stocks = await _context.Stocks.Take(100).ToListAsync();
             const int batchSize = 1000; // Process in batches of 1000 records
@@ -506,7 +506,7 @@ namespace API.Data
         {
             var stocks = await _context.Stocks.Take(200).OrderBy(x => x.Id).ToListAsync(); // Fetch the first 100 stocks
             var semaphore = new SemaphoreSlim(6); // Limit concurrent operations to 5
-  
+
             var allStockPrices = new ConcurrentBag<StockPrice>();
             var allStockDividends = new ConcurrentBag<StockDividend>();
             var allStockNews = new ConcurrentBag<StockNews>();
@@ -579,7 +579,7 @@ namespace API.Data
                             stock.DividendRate = stockData.Financials.DividendRate; // Map DividendRate
                             stock.fiftyTwoWeekHigh = stockData.Financials.fiftyTwoWeekHigh;
                             stock.fiftyTwoWeekLow = stockData.Financials.fiftyTwoWeekLow;
-                            stock.ChangePercentage=( (stockData.Financials.regularMarketChange/stockData.Financials.shareprice)*100);
+                            stock.ChangePercentage = ((stockData.Financials.regularMarketChange / stockData.Financials.shareprice) * 100);
                             stock.hasDividends = stockData.Financials.DividendYield.HasValue || stockData.Financials.DividendYield.HasValue;
                         }
 
@@ -688,17 +688,17 @@ namespace API.Data
             foreach (var user in users)
             {
                 // Check if the user already exists
-              
-                    var result = await userManager.CreateAsync(user, "Password123!"); // Default password
-                    if (result.Succeeded)
-                    {
-                        Console.WriteLine($"User {user.Email} created successfully.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Failed to create user {user.Email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                    }
-             
+
+                var result = await userManager.CreateAsync(user, "Password123!"); // Default password
+                if (result.Succeeded)
+                {
+                    Console.WriteLine($"User {user.Email} created successfully.");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to create user {user.Email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                }
+
             }
 
             // Fetch 15 random stocks from the database
@@ -748,7 +748,135 @@ namespace API.Data
             Console.WriteLine("Users and watchlists seeded successfully.");
         }
 
+        // Add this method to your Seed.cs class
+        public async Task SeedForumDataAsync()
+        {
+            if (await _context.ForumThreads.AnyAsync()) return;
 
+            var users = await _context.Users.ToListAsync();
+            if (!users.Any()) return;
 
+            var threads = new List<ForumThread>
+            {
+                new ForumThread
+                {
+                    Title = "Welcome to the Stock Discussion Forum!",
+                    Description = "Introduce yourself and share your investment experience",
+                    CreatedBy = users.First().Id,
+                    CreatedAt = DateTime.UtcNow.AddDays(-30),
+                    LastMessageAt = DateTime.UtcNow.AddHours(-2),
+                    MessageCount = 15,
+                    IsActive = true
+                },
+                new ForumThread
+                {
+                    Title = "Best stocks for 2024?",
+                    Description = "What are your top picks for this year and why?",
+                    CreatedBy = users.Skip(1).First().Id,
+                    CreatedAt = DateTime.UtcNow.AddDays(-25),
+                    LastMessageAt = DateTime.UtcNow.AddHours(-1),
+                    MessageCount = 23,
+                    IsActive = true
+                },
+                new ForumThread
+                {
+                    Title = "Tech stocks discussion",
+                    Description = "Share your thoughts on FAANG and other tech companies",
+                    CreatedBy = users.Skip(2).First().Id,
+                    CreatedAt = DateTime.UtcNow.AddDays(-20),
+                    LastMessageAt = DateTime.UtcNow.AddMinutes(-30),
+                    MessageCount = 31,
+                    IsActive = true
+                },
+                new ForumThread
+                {
+                    Title = "Dividend investing strategies",
+                    Description = "Let's discuss dividend growth investing and REIT strategies",
+                    CreatedBy = users.First().Id,
+                    CreatedAt = DateTime.UtcNow.AddDays(-15),
+                    LastMessageAt = DateTime.UtcNow.AddMinutes(-45),
+                    MessageCount = 18,
+                    IsActive = true
+                },
+                new ForumThread
+                {
+                    Title = "Market volatility concerns",
+                    Description = "How are you handling the current market conditions?",
+                    CreatedBy = users.Skip(1).First().Id,
+                    CreatedAt = DateTime.UtcNow.AddDays(-10),
+                    LastMessageAt = DateTime.UtcNow.AddMinutes(-15),
+                    MessageCount = 42,
+                    IsActive = true
+                }
+            };
+
+            _context.ForumThreads.AddRange(threads);
+            await _context.SaveChangesAsync();
+
+            // Add some sample messages
+            var messages = new List<ForumMessage>
+            {
+                new ForumMessage
+                {
+                    ThreadId = threads[0].Id,
+                    UserId = users.Skip(1).First().Id,
+                    Content = "Great idea for a forum! I'm excited to connect with other investors here.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-29)
+                },
+                new ForumMessage
+                {
+                    ThreadId = threads[0].Id,
+                    UserId = users.Skip(2).First().Id,
+                    Content = "Hello everyone! I've been investing for 5 years now, mostly in index funds but looking to expand my knowledge.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-28)
+                },
+                new ForumMessage
+                {
+                    ThreadId = threads[1].Id,
+                    UserId = users.First().Id,
+                    Content = "I'm bullish on renewable energy stocks this year. Companies like TSLA, ENPH, and SPWR look promising.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-24)
+                },
+                new ForumMessage
+                {
+                    ThreadId = threads[1].Id,
+                    UserId = users.Skip(2).First().Id,
+                    Content = "Don't forget about healthcare! Aging population means companies like JNJ and PFE could see steady growth.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-23)
+                },
+                new ForumMessage
+                {
+                    ThreadId = threads[2].Id,
+                    UserId = users.Skip(1).First().Id,
+                    Content = "AAPL earnings were impressive last quarter. Their services revenue continues to grow steadily.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-19)
+                },
+                new ForumMessage
+                {
+                    ThreadId = threads[2].Id,
+                    UserId = users.First().Id,
+                    Content = "I'm watching NVDA closely. AI boom is real but the valuation seems stretched. What do you think?",
+                    CreatedAt = DateTime.UtcNow.AddDays(-18)
+                },
+                new ForumMessage
+                {
+                    ThreadId = threads[3].Id,
+                    UserId = users.Skip(2).First().Id,
+                    Content = "REITs have been solid for me. O (Realty Income) pays monthly dividends which is nice for cash flow.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-14)
+                },
+                new ForumMessage
+                {
+                    ThreadId = threads[4].Id,
+                    UserId = users.First().Id,
+                    Content = "The key is to stay disciplined during volatile times. Dollar-cost averaging has served me well.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-9)
+                }
+            };
+
+            _context.ForumMessages.AddRange(messages);
+            await _context.SaveChangesAsync();
+        }
     }
+    
 }

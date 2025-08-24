@@ -1,0 +1,192 @@
+.register-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .register-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .register-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .register-header {
+    margin-bottom: 2rem;
+  }
+  
+  .brand-logo i {
+    font-size: 3rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .form-floating {
+    position: relative;
+  }
+  
+  .form-floating > .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem 0.75rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-floating > .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+  }
+  
+  .form-floating > label {
+    color: #6c757d;
+    font-weight: 500;
+    padding: 1rem 0.75rem;
+  }
+  
+  .form-floating > .form-control:focus ~ label,
+  .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #667eea;
+    font-weight: 600;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  }
+  
+  .btn-primary:disabled {
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .btn-outline-dark {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    color: #495057;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-dark:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+    transform: translateY(-1px);
+  }
+  
+  .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+  
+  .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  }
+  
+  .divider {
+    position: relative;
+    text-align: center;
+    margin: 2rem 0;
+  }
+  
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e9ecef;
+  }
+  
+  .divider-text {
+    background: white;
+    color: #6c757d;
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .invalid-feedback {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .register-container {
+      padding: 10px;
+    }
+    
+    .register-card {
+      padding: 30px 20px;
+      border-radius: 15px;
+    }
+    
+    .brand-logo i {
+      font-size: 2.5rem;
+    }
+    
+    .register-header h2 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  /* Animation for form elements */
+  .form-floating {
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Stagger animation for form fields */
+  .form-floating:nth-child(1) { animation-delay: 0.1s; }
+  .form-floating:nth-child(2) { animation-delay: 0.2s; }
+  .form-floating:nth-child(3) { animation-delay: 0.3s; }
+  .form-floating:nth-child(4) { animation-delay: 0.4s; }
+  .form-floating:nth-child(5) { animation-delay: 0.5s; }

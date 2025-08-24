@@ -21,4 +21,12 @@ getStockById(id: number): Observable<stock | null> {
   return this.http.get<stock>(`${this.baseUrl}stock/${id}`);
 }
 
+getstockBySymbol(symbol: string): Observable<stock | null> {
+  return this.http.get<stock>(`${this.baseUrl}stock/search/${symbol}`);
+}
+
+getAllEtfs(): Observable<stock[] | null> {
+  return this.http.get<stock[]>(`${this.baseUrl}stock/etf`);
+}
+
 }

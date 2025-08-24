@@ -1,0 +1,48 @@
+<div class="news-container">
+  <!-- Featured News Section -->
+  <div class="featured-section" *ngIf="newsList && newsList.length > 0">
+    <h2 class="section-title">Featured News</h2>
+    <div class="featured-card" (click)="openNewsDetail(newsList[0])">
+      <div class="featured-image" *ngIf="newsList[0].imageUrl">
+        <img [src]="newsList[0].imageUrl" [alt]="newsList[0].title" loading="lazy">
+        <div class="category-badge">{{ newsList[0].category || 'Breaking' }}</div>
+      </div>
+      <div class="featured-content">
+        <h3 class="featured-title">{{ newsList[0].title }}</h3>
+        <p class="featured-description">{{ newsList[0].description }}</p>
+        <div class="featured-meta">
+          <span class="source">{{ newsList[0].source }}</span>
+          <span class="divider">•</span>
+          <span class="time">{{ newsList[0].publishedAt | date:'MMM d, y' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- News Grid Section -->
+  <div class="news-section">
+    <h2 class="section-title">Latest News</h2>
+    <div class="news-grid">
+      <div class="news-card" 
+           *ngFor="let news of newsList?.slice(1); let i = index" 
+           (click)="openNewsDetail(news)">
+        
+        <div class="card-image" *ngIf="news.imageUrl">
+          <img [src]="news.imageUrl" [alt]="news.title" loading="lazy">
+          <div class="category-tag">{{ news.category || 'News' }}</div>
+        </div>
+        
+        <div class="card-content">
+          <h4 class="card-title">{{ news.title }}</h4>
+          <p class="card-description" *ngIf="news.description">
+            {{ news.description | slice:0:120 }}{{ (news.summary?.length || 0) > 120 ? '...' : '' }}
+          </p>
+          <div class="card-meta">
+            <span class="card-source">{{ news.source }}</span>
+            <span class="card-time">{{ news.publishedAt | date:'MMM d' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

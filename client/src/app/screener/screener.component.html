@@ -1,0 +1,282 @@
+<div class="screener-container">
+    <!-- Header Section -->
+    <div class="screener-header">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="mb-3">
+          <p class="text-muted mb-0">Filter and discover stocks based on your criteria</p>
+        </div >
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary" (click)="resetFilters()">
+            <i class="fas fa-undo me-2"></i>Reset
+          </button>
+          <button class="btn btn-primary" (click)="applyFilters()">
+            <i class="fas fa-search me-2"></i>Screen Stocks
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <!-- Market Data Filters -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">
+          Market Data
+        </h3>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Market Cap</label>
+            <select class="form-select" [(ngModel)]="marketCapFilter" name="marketCapFilter">
+              <option value="">All Market Caps</option>
+              <option value="large">Large Cap (>$10B)</option>
+              <option value="mid">Mid Cap ($2B-$10B)</option>
+              <option value="small">Small Cap (<$2B)</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Sector</label>
+            <select class="form-select" [(ngModel)]="sector" name="sector">
+              <option value="">All Sectors</option>
+              <option value="technology">Technology</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="finance">Finance</option>
+              <option value="energy">Energy</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">30-Day Avg Volume</label>
+            <select class="form-select" [(ngModel)]="volume" name="volume">
+              <option value="">Any Volume</option>
+              <option value="greaterThan1M">Greater than 1M</option>
+              <option value="greaterThan5M">Greater than 5M</option>
+              <option value="greaterThan10M">Greater than 10M</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Capital Efficiency</label>
+            <select class="form-select" [(ngModel)]="capitalEfficiency" name="capitalEfficiency">
+              <option value="">Any Efficiency</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Price & Performance Filters -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">
+          Price & Performance
+        </h3>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Stock Price Range</label>
+            <div class="input-group">
+              <input type="number" class="form-control" [(ngModel)]="priceRangeMin" placeholder="Min $" name="priceRangeMin">
+              <span class="input-group-text">to</span>
+              <input type="number" class="form-control" [(ngModel)]="priceRangeMax" placeholder="Max $" name="priceRangeMax">
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Price Change</label>
+            <select class="form-select" [(ngModel)]="priceChange" name="priceChange">
+              <option value="">Any Change</option>
+              <option value="1day">1 Day</option>
+              <option value="5days">5 Days</option>
+              <option value="1month">1 Month</option>
+              <option value="3months">3 Months</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Price Change %</label>
+            <select class="form-select" [(ngModel)]="priceChangePercent" name="priceChangePercent">
+              <option value="">Any %</option>
+              <option value="0-5">0% - 5%</option>
+              <option value="5-10">5% - 10%</option>
+              <option value="10-20">10% - 20%</option>
+              <option value="20+">20%+</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Signal Status</label>
+            <select class="form-select" [(ngModel)]="signalStatus" name="signalStatus">
+              <option value="">Any Signal</option>
+              <option value="buy">Buy</option>
+              <option value="sell">Sell</option>
+              <option value="hold">Hold</option>
+            </select>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Advanced Filters -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">
+          Advanced Filters
+        </h3>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Market Cap Range</label>
+            <input type="range" class="form-range" [(ngModel)]="marketCap" min="0" max="100" name="marketCap">
+            <div class="d-flex justify-content-between text-muted small">
+              <span>$0</span>
+              <span>$100B+</span>
+            </div>
+          </div>
+          <!-- <div class="col-md-6 mb-3">
+            <label class="form-label">Fear & Greed Index</label>
+            <input type="range" class="form-range" [(ngModel)]="fearGreed" min="0" max="100" name="fearGreed">
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Fear</span>
+              <span>Greed</span>
+            </div>
+          </div> -->
+        </div>
+      </div>
+  
+      <!-- Movement & Trends -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">
+          Movement & Trends
+        </h3>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Movement Direction</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="movingUp" name="movingUp" id="movingUp">
+                <label class="form-check-label text-success" for="movingUp">
+                  <i class="fas fa-arrow-up me-1"></i>Moving Up
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="movingDown" name="movingDown" id="movingDown">
+                <label class="form-check-label text-danger" for="movingDown">
+                  <i class="fas fa-arrow-down me-1"></i>Moving Down
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" [(ngModel)]="noChange" name="noChange" id="noChange">
+                <label class="form-check-label text-secondary" for="noChange">
+                  <i class="fas fa-minus me-1"></i>No Change
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Trend Indicator</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="overlayIndicator" value="uptrend" name="overlayIndicator" id="uptrend">
+                <label class="form-check-label text-success" for="uptrend">
+                  <i class="fas fa-trending-up me-1"></i>Uptrend
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="overlayIndicator" value="downtrend" name="overlayIndicator" id="downtrend">
+                <label class="form-check-label text-danger" for="downtrend">
+                  <i class="fas fa-trending-down me-1"></i>Downtrend
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="overlayIndicator" value="neutral" name="overlayIndicator" id="neutral">
+                <label class="form-check-label text-secondary" for="neutral">
+                  <i class="fas fa-minus me-1"></i>Neutral
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Results Section -->
+    <div class="results-section">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h3 class="mb-0">
+          <i class="fas fa-list me-2"></i>
+          Screening Results
+          <span class="badge bg-primary ms-2">{{ filteredStocks?.length || 0 }}</span>
+        </h3>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-download me-1"></i>Export
+          </button>
+          <button class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-save me-1"></i>Save Screen
+          </button>
+        </div>
+      </div>
+    <!-- Table View -->
+    <div *ngIf="filteredStocks && filteredStocks.length > 0"  class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">Symbol</th>
+              <th scope="col">Name</th>
+              <th scope="col">Price</th>
+              <th scope="col">Change</th>
+              <th scope="col">Change %</th>
+              <th scope="col">Volume</th>
+              <th scope="col">Market Cap</th>
+              <th scope="col">Sector</th>
+              <th scope="col">Signal</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+                <tr *ngFor="let stock of filteredStocks; " 
+                    class="table-row"
+                    >
+                <td>
+                    <strong class="text-primary">{{ stock.symbol }}</strong>
+                </td>
+                <td>{{ stock.companyName }}</td>
+                <td>
+                    <strong>${{ stock.currentPrice | number:'1.2-2' }}</strong>
+                </td>
+                <td>
+                    <span [class]="stock.change >= 0 ? 'text-success' : 'text-danger'">
+                    <i [class]="stock.change >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="me-1"></i>
+                    ${{ stock.change | number:'1.2-2' }}
+                    </span>
+                </td>
+                <td>
+                    <span [class]="stock.changePercent >= 0 ? 'text-success' : 'text-danger'">
+                    {{ stock.changePercent | number:'1.2-2' }}%
+                    </span>
+                </td>
+                <td>{{ stock.volume | number }}</td>
+                <td>{{ stock.marketCap }}</td>
+                <td>
+                    <span class="badge bg-secondary">{{ stock.sector }}</span>
+                </td>
+                <td>
+                    <span  class="badge">
+                    {{ stock.signal }}
+                    </span>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" 
+                           (click)="viewStock(stock.symbol)"
+                           title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-success"  title="Add to Watchlist">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    </div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+      <!-- Results table or cards would go here -->
+      <div class="alert alert-info" *ngIf="!filteredStocks || filteredStocks.length === 0">
+        <i class="fas fa-info-circle me-2"></i>
+        Apply filters above to screen stocks based on your criteria.
+      </div>
+    </div>
+  </div>

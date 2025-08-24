@@ -5,6 +5,7 @@ using API.Helpers;
 using API.Interfaces;
 using API.MIddleware;
 using API.Services;
+using API.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -20,6 +21,8 @@ builder.Services.AddDbContext<DataContext>(opt =>
 builder.Services.AddCors();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<IForumRepository,ForumRepository>();
+builder.Services.AddSignalR();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddIdentityServices(builder.Configuration);
 
@@ -44,7 +47,7 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
-
+app.MapHub<ForumHub>("/hubs/forumHub");
 
 // Add Data
 using (var scope = app.Services.CreateScope())
@@ -56,9 +59,10 @@ using (var scope = app.Services.CreateScope())
     {
         var seed = services.GetRequiredService<Seed>();
         //await seed.SeedStocksAsync();
-       // await seed.FetchAndStoreStockDataParallel();
-       // await seed.LoadGeneralNews();
-       // await seed.SeedUsersAndWatchlists(userManager);
+        // await seed.FetchAndStoreStockDataParallel();
+        // await seed.LoadGeneralNews();
+        // await seed.SeedUsersAndWatchlists(userManager);
+        await seed.SeedForumDataAsync();
         Console.WriteLine("Seeding completed successfully.\n");
     }
     catch (Exception ex)

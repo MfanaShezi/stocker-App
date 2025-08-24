@@ -1,0 +1,243 @@
+<div class="register-container">
+    <div class="register-card">
+      <!-- Header Section -->
+      <div class="register-header text-center mb-4">
+        <div class="brand-logo mb-3">
+          <i class="fas fa-chart-line text-primary"></i>
+        </div>
+        <h2 class="h3 mb-2 fw-bold text-dark">Create Your Trading Account</h2>
+        <p class="text-muted mb-0">Join thousands of investors and start your journey</p>
+      </div>
+  
+      <!-- Registration Form -->
+      <form (ngSubmit)="register()" #registerForm="ngForm" class="register-form">
+        
+        <!-- Full Name -->
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            [(ngModel)]="model.fullName"
+            class="form-control"
+            placeholder="Full Name"
+            required
+            #fullName="ngModel"
+          />
+          <label for="fullName">
+            <i class="fas fa-user me-2"></i>Full Name
+          </label>
+          <div *ngIf="fullName.invalid && fullName.touched" class="invalid-feedback d-block">
+            Full name is required
+          </div>
+        </div>
+  
+        <!-- Username -->
+        <div class="form-floating mb-3">
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="model.username"
+            class="form-control"
+            placeholder="Username"
+            required
+            #username="ngModel"
+          />
+          <label for="username">
+            <i class="fas fa-at me-2"></i>Username
+          </label>
+          <div *ngIf="username.invalid && username.touched" class="invalid-feedback d-block">
+            Username is required
+          </div>
+        </div>
+  
+        <!-- Email -->
+        <div class="form-floating mb-3">
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="model.email"
+            class="form-control"
+            placeholder="Email Address"
+            required
+            email
+            #email="ngModel"
+          />
+          <label for="email">
+            <i class="fas fa-envelope me-2"></i>Email Address
+          </label>
+          <div *ngIf="email.invalid && email.touched" class="invalid-feedback d-block">
+            <div *ngIf="email.errors?.['required']">Email is required</div>
+            <div *ngIf="email.errors?.['email']">Please enter a valid email</div>
+          </div>
+        </div>
+  
+        <!-- Password -->
+        <div class="form-floating mb-3">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="model.password"
+            class="form-control"
+            placeholder="Password"
+            required
+            minlength="6"
+            #password="ngModel"
+          />
+          <label for="password">
+            <i class="fas fa-lock me-2"></i>Password
+          </label>
+          <div *ngIf="password.invalid && password.touched" class="invalid-feedback d-block">
+            <div *ngIf="password.errors?.['required']">Password is required</div>
+            <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters</div>
+          </div>
+        </div>
+  
+        <!-- Confirm Password -->
+        <div class="form-floating mb-4">
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="model.confirmPassword"
+            class="form-control"
+            placeholder="Confirm Password"
+            required
+            #confirmPassword="ngModel"
+          />
+          <label for="confirmPassword">
+            <i class="fas fa-lock me-2"></i>Confirm Password
+          </label>
+          <div *ngIf="confirmPassword.invalid && confirmPassword.touched" class="invalid-feedback d-block">
+            Please confirm your password
+          </div>
+          <div *ngIf="model.password !== model.confirmPassword && confirmPassword.touched" class="invalid-feedback d-block">
+            Passwords do not match
+          </div>
+        </div>
+  
+        <!-- Trading Profile Section -->
+        <div class="trading-profile-section mb-4">
+          <h5 class="section-title mb-3">
+            Trading Profile
+          </h5>
+          
+          <!-- Trading Style -->
+          <div class="form-floating mb-3">
+            <select
+              id="tradingStyle"
+              name="tradingStyle"
+              [(ngModel)]="model.tradingStyle"
+              class="form-select"
+              required
+              #tradingStyle="ngModel"
+            >
+              <option value="">Select Investment Style</option>
+              <option value="Short-Term">Short Term</option>
+              <option value="Long-term">Long Term</option>
+              <option value="Balanced">Balanced</option>
+            </select>
+            <label for="tradingStyle">
+              <i class="fas fa-chart-line me-2"></i>Investment Style
+            </label>
+            <div *ngIf="tradingStyle.invalid && tradingStyle.touched" class="invalid-feedback d-block">
+              Please select your Investment style
+            </div>
+          </div>
+  
+          <!-- Risk Appetite -->
+          <div class="form-floating mb-3">
+            <select
+              id="riskAppetite"
+              name="riskAppetite"
+              [(ngModel)]="model.riskAppetite"
+              class="form-select"
+              required
+              #riskAppetite="ngModel"
+            >
+              <option value="">Select Risk Appetite</option>
+              <option value="conservative">Conservative (Low Risk)</option>
+              <option value="moderate">Moderate (Medium Risk)</option>
+            </select>
+            <label for="riskAppetite">
+              <i class="fas fa-exclamation-triangle me-2"></i>Risk Appetite
+            </label>
+            <div *ngIf="riskAppetite.invalid && riskAppetite.touched" class="invalid-feedback d-block">
+              Please select your risk appetite
+            </div>
+          </div>
+  
+          <!-- Investment Goal -->
+          <div class="form-floating mb-4">
+            <select
+              id="investmentGoal"
+              name="investmentGoal"
+              [(ngModel)]="model.investmentGoal"
+              class="form-select"
+              required
+              #investmentGoal="ngModel"
+            >
+              <option value="">Select Investment Goal</option>
+              <option value="wealth-building">Long-term Wealth Building</option>
+              <option value="income-generation">Income Generation</option>
+              <option value="capital-preservation">Capital Preservation</option>
+              <option value="speculation">Speculation/High Returns</option>
+              <option value="retirement">Retirement Planning</option>
+              <option value="education">Education Funding</option>
+            </select>
+            <label for="investmentGoal">
+              <i class="fas fa-bullseye me-2"></i>Investment Goal
+            </label>
+            <div *ngIf="investmentGoal.invalid && investmentGoal.touched" class="invalid-feedback d-block">
+              Please select your investment goal
+            </div>
+          </div>
+        </div>
+  
+        <!-- Terms & Conditions -->
+        <div class="form-check mb-4">
+          <input
+            type="checkbox"
+            id="agreeTerms"
+            name="agreeTerms"
+            [(ngModel)]="model.agreeTerms"
+            class="form-check-input"
+            required
+            #agreeTerms="ngModel"
+          />
+          <label for="agreeTerms" class="form-check-label text-sm">
+            I agree to the <a href="#" class="text-primary text-decoration-none">Terms of Service</a> 
+            and <a href="#" class="text-primary text-decoration-none">Privacy Policy</a>
+          </label>
+          <div *ngIf="agreeTerms.invalid && agreeTerms.touched" class="invalid-feedback d-block">
+            You must agree to the terms and conditions
+          </div>
+        </div>
+  
+        <!-- Submit Button -->
+        <div class="d-grid mb-4">
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg"
+            [disabled]="registerForm.invalid || isLoading"
+          >
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!isLoading" class="fas fa-user-plus me-2"></i>
+            {{ isLoading ? 'Creating Account...' : 'Create  Account' }}
+          </button>
+        </div>
+  
+        <!-- Login Link -->
+        <div class="text-center">
+          <p class="text-muted mb-0">
+            Already have an account? 
+            <a routerLink="/login" class="text-primary text-decoration-none fw-semibold">Sign in here</a>
+          </p>
+        </div>
+  
+      </form>
+    </div>
+  </div>

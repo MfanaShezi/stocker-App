@@ -1,0 +1,110 @@
+<div class="thread-container">
+    <!-- Header -->
+    <div class="thread-header">
+      <div class="header-content">
+        <div class="header-left">
+          <button class="btn-back" [routerLink]="['/forum']">
+            <i class="bi bi-arrow-left me-2"></i>Back to Forum
+          </button>
+          
+          <div *ngIf="thread" class="thread-info">
+            <h1 class="thread-title">{{ thread.title }}</h1>
+            <div class="thread-meta">
+              <span class="creator">Started by {{ thread.creatorUsername }}</span>
+              <span class="created-date">{{ formatDate(thread.createdAt) }}</span>
+              <span class="message-count">{{ thread.messageCount }} replies</span>
+            </div>
+            <p *ngIf="thread.description" class="thread-description">
+              {{ thread.description }}
+            </p>
+          </div>
+        </div>
+  
+        <div class="header-actions">
+          <div class="connection-status" [class.connected]="connectionStatus()" [class.disconnected]="!connectionStatus()">
+            <span class="status-dot"></span>
+            {{ connectionStatus() ? 'Live' : 'Offline' }}
+          </div>
+          
+          <button *ngIf="canDeleteThread()" class="btn btn-danger btn-sm" (click)="deleteThread()">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Messages -->
+    <div class="messages-container">
+      <div *ngIf="messages().length === 0" class="empty-messages">
+        <i class="bi bi-chat-dots"></i>
+        <p>No messages yet. Be the first to reply!</p>
+      </div>
+  
+      <div *ngFor="let message of messages(); trackBy: trackByMessageId" class="message-card">
+        <div class="message-header">
+          <div class="message-author">
+            <div class="author-avatar">
+              {{ message.username.charAt(0).toUpperCase() }}
+            </div>
+            <div class="author-info">
+              <span class="author-name">{{ message.username }}</span>
+              <span class="message-time">{{ formatDate(message.createdAt) }}</span>
+            </div>
+          </div>
+          
+          <div *ngIf="canDeleteMessage(message)" class="message-actions">
+            <button class="btn-delete" (click)="deleteMessage(message.id)" title="Delete message">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+  
+        <div class="message-content">
+          {{ message.content }}
+        </div>
+      </div>
+    </div>
+  
+ <!-- Update the message input section in thread-detail.component.html -->
+<div class="message-input-container">
+    <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="message-form">
+      <div class="input-header">
+        Comment as {{ currentUser()?.username }}
+      </div>
+      
+      <div class="input-body">
+        <textarea 
+          formControlName="content"
+          class="message-input"
+          placeholder="What are your thoughts?"
+          rows="5"
+          (keydown)="onKeyDown($event)">
+        </textarea>
+      </div>
+      
+      <div class="input-actions">
+        <div class="character-count" 
+             [class.warning]="getCharacterCount() > 1800"
+             [class.danger]="getCharacterCount() > 1950">
+          {{ getCharacterCount() }}/2000
+        </div>
+        
+        <div class="action-buttons">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="!messageForm.valid || isLoading">
+            <span *ngIf="!isLoading">Comment</span>
+            <span *ngIf="isLoading">
+              <i class="bi bi-arrow-clockwise spin"></i> Posting...
+            </span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="form-help">
+        Ctrl+Enter to post quickly
+      </div>
+    </form>
+  </div>
+  </div>

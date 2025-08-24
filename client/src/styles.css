@@ -1,1 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap');
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Override Bootstrap fonts if you're using Bootstrap */
+.btn, .form-control, .form-select, .form-label, 
+.table, .card,h1, h2, h3, h4, h5, h6, .nav, .navbar, .dropdown-menu {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}

@@ -1,20 +1,18 @@
-<nav class="navbar navbar-expand-lg  navbar-dark  fixed-top mb-6">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top mb-6">
   <div class="container-fluid">
+    <!-- Brand - Far Left -->
     <a class="navbar-brand" routerLink="/" routerLinkActive="active">
-      <span class="icon"> <i class="fa fa-caret-square-o-right" aria-hidden="true"></i></span>
-      Stocker</a>
+      <span class="icon"><i class="fa fa-caret-square-o-right" aria-hidden="true"></i></span>
+      Stocker
+    </a>
 
-      <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarCollapse"
-    >
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    <!-- Center Content -->
     <div class="collapse navbar-collapse" id="navbarCollapse">
-      <!-- <div class="row  ms-auto" > -->
+      <div class="mx-auto d-flex flex-column flex-lg-row align-items-center">
         <form class="search-container m-2" (submit)="onSearch()">
           <input
             type="text"
@@ -25,31 +23,45 @@
           <button type="submit"><i class="fa fa-search"></i></button>
         </form>
 
-        <ul class="nav-links m-2">
+        <ul class="nav-links">
           <li><a routerLink="/dashboard">Dashboard</a></li>
           <li><a routerLink="/stocks">Stocks</a></li>
-          <li><a routerLink="/etfs">ETFs</a></li>
+          <li><a (click)="getetfs()">ETFs</a></li>
           <li><a routerLink="/suggested">Suggested</a></li>
           <li><a routerLink="/news">News</a></li>
-          <li><a routerLink="/community">Community</a></li>
+          <li><a routerLink="/forum">Community</a></li>
         </ul>
-    <!-- </div> -->
-   
+      </div>
 
-<!-- User logging -->
-      <form #loginForm="ngForm" (ngSubmit)="login()" class="d-flex ms-auto">
-        <input name="Username" 
-        [(ngModel)]="model.Username" 
-        class="form-control me-2" 
-        placeholder="Username" >
-        <input 
-        name="password"
-        [(ngModel)]="model.Password"
-        class="form-control me-2" 
-        placeholder="Password" 
-        type="password"  >
-        <button class="btn btn-success" type="submit">Login</button>
-      </form>
+      <!-- Welcome/Login - Far Right -->
+      @if(accountService.currentUser()){
+        <div class="dropdown ms-auto">
+          <a class="dropdown-toggle text-light text-decoration-none" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome &nbsp; 
+            <span><i class="fa fa-user me-2"></i></span>
+            {{accountService.currentUser()?.username}}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end logoutbtn" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item shadow-sm loglink" (click)="logout()">Logout</a></li>
+          </ul>
+        </div>
+      }
+
+      @if(!accountService.currentUser()){
+        <form #loginForm="ngForm" (ngSubmit)="login()" class="d-flex ms-auto">
+          <input name="Username" 
+                 [(ngModel)]="model.Username" 
+                 class="form-control me-2" 
+                 placeholder="Username">
+          <input name="password"
+                 [(ngModel)]="model.Password"
+                 class="form-control me-2" 
+                 placeholder="Password" 
+                 type="password">
+          <button class="btn btn-success me-2" type="submit">Login</button>
+        </form>
+        <button class="btn btn-primary" routerLink="/register">Register</button>
+      }
     </div>
   </div>
 </nav>

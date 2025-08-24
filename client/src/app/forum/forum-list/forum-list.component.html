@@ -1,0 +1,158 @@
+<div class="forum-container">
+    <!-- Header -->
+    <div class="forum-header">
+      <div class="header-content">
+        <h1 class="forum-title">Discussion Forum</h1>
+        <div class="header-actions">
+          <div class="connection-status" [class.connected]="connectionStatus()" [class.disconnected]="!connectionStatus()">
+            <span class="status-dot"></span>
+            {{ connectionStatus() ? 'Connected' : 'Disconnected' }}
+          </div>
+          <button class="btn btn-primary" 
+           (click)="toggleNewThreadForm()"
+           [disabled]="isCreatingThread">
+            <i class="bi bi-plus-circle me-2"></i>
+            {{ showNewThreadForm ? 'Cancel' : 'New Discussion' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+     <!-- New Thread Form -->
+  @if(showNewThreadForm) {
+    <div class="new-thread-form-container">
+      <form [formGroup]="newThreadForm" (ngSubmit)="createThread()" class="new-thread-form">
+        <div class="form-header">
+          <h3 class="fs-6">
+            <i class="fa fa-edit"></i>
+            Start a New Discussion
+          </h3>
+          <button 
+            type="button" 
+            class="btn btn-ghost hide-btn" 
+            (click)="hideNewThreadForm()"
+            [disabled]="isCreatingThread">
+            <!-- <i class="fa fa-times"></i>
+            Hide -->
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label for="title">Discussion Title *</label>
+          <input 
+            type="text" 
+            id="title"
+            formControlName="title"
+            class="form-control"
+            placeholder="Enter a descriptive title for your discussion..."
+            [class.error]="newThreadForm.get('title')?.invalid && newThreadForm.get('title')?.touched">
+          
+          @if(newThreadForm.get('title')?.invalid && newThreadForm.get('title')?.touched) {
+            <div class="error-message">
+              @if(newThreadForm.get('title')?.errors?.['required']) {
+                Title is required
+              }
+              @if(newThreadForm.get('title')?.errors?.['minlength']) {
+                Title must be at least 5 characters long
+              }
+              @if(newThreadForm.get('title')?.errors?.['maxlength']) {
+                Title cannot exceed 100 characters
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="content">Discussion Content *</label>
+          <textarea 
+            id="content"
+            formControlName="content"
+            class="form-control content-textarea"
+            rows="6"
+            placeholder="Share your thoughts, ask questions, or start a meaningful discussion..."
+            [class.error]="newThreadForm.get('content')?.invalid && newThreadForm.get('content')?.touched">
+          </textarea>
+          
+          @if(newThreadForm.get('content')?.invalid && newThreadForm.get('content')?.touched) {
+            <div class="error-message">
+              @if(newThreadForm.get('content')?.errors?.['required']) {
+                Content is required
+              }
+              @if(newThreadForm.get('content')?.errors?.['minlength']) {
+                Content must be at least 10 characters long
+              }
+              @if(newThreadForm.get('content')?.errors?.['maxlength']) {
+                Content cannot exceed 2000 characters
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary m-2" 
+            (click)="hideNewThreadForm()"
+            [disabled]="isCreatingThread">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="newThreadForm.invalid || isCreatingThread">
+            @if(isCreatingThread) {
+              <i class="fa fa-spinner fa-spin"></i>
+              Creating...
+            } @else {
+              <i class="fa fa-paper-plane"> </i>
+               Create Discussion
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+  
+    <!-- Thread List -->
+    <div class="threads-container">
+      <div *ngIf="threads().length === 0" class="empty-state">
+        <i class="bi bi-chat-dots"></i>
+        <h3>No discussions yet</h3>
+        <p>Be the first to start a conversation!</p>
+        <button class="btn btn-primary" (click)="createNewThread()">Start Discussion</button>
+      </div>
+  
+      <div *ngFor="let thread of threads(); trackBy: trackByThreadId" class="thread-card" 
+           [routerLink]="['/forum/thread', thread.id]">
+        
+        <div class="thread-content">
+          <div class="thread-header">
+            <h3 class="thread-title">{{ thread.title }}</h3>
+            <div class="thread-meta">
+              <span class="creator">by {{ thread.creatorUsername }}</span>
+              <span class="created-date">{{ formatDate(thread.createdAt) }}</span>
+            </div>
+          </div>
+  
+          <p *ngIf="thread.description" class="thread-description">
+            {{ thread.description }}
+          </p>
+  
+          <div class="thread-stats">
+            <div class="stat-item">
+              <i class="bi bi-chat-left-text"></i>
+              <span>{{ thread.messageCount }} {{ thread.messageCount === 1 ? 'reply' : 'replies' }}</span>
+            </div>
+            <div class="stat-item last-activity">
+              <i class="bi bi-clock"></i>
+              <span>Last activity {{ formatTime(thread.lastMessageAt) }}</span>
+            </div>
+          </div>
+        </div>
+  
+        <div class="thread-arrow">
+          <i class="bi bi-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+  </div>
