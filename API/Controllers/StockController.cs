@@ -4,10 +4,11 @@ using API.DTOs;
 using API.Extensions;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
-
+[Authorize]
 public class StockController(IStockRepository stockRepository) : BaseApiController
 {
     [HttpGet]
@@ -50,13 +51,13 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
     [HttpPost("{stockId}/watchlist")]
     public async Task<ActionResult> AddToWatchlist(int stockId)
     {
-        
+
         // if (!User.Identity?.IsAuthenticated ?? true)
         // {
         //     return Unauthorized("User is not authenticated");
         // }
 
-         var userId = HttpContext.User.GetUserId();
+        var userId = HttpContext.User.GetUserId();
         var result = await stockRepository.AddToWatchlist(stockId, userId);
 
         if (!result)
@@ -70,7 +71,7 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
     [HttpDelete("{stockId}/watchlist")]
     public async Task<ActionResult> RemoveFromWatchlist(int stockId)
     {
-       var userId = User.GetUserId();
+        var userId = User.GetUserId();
         var result = await stockRepository.RemoveFromWatchlistAsync(stockId, userId);
 
         if (!result)
@@ -84,7 +85,7 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
     [HttpGet("watchlist")]
     public async Task<ActionResult<IEnumerable<StockDto>>> GetWatchlist()
     {
-        var userId = User.GetUserId();
+        var userId = HttpContext.User.GetUserId();
         var watchlist = await stockRepository.GetWatchlistAsync(userId);
         return Ok(watchlist);
     }
@@ -94,6 +95,13 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
     {
         var stock = await stockRepository.GetStockBySymbolAsync(symbol);
         return Ok(stock);
+    }
+    
+    [HttpGet("news")]
+    public async Task<ActionResult<List<NewsDto>>> GetGeneralNews()
+    {
+        var news = await stockRepository.GetGeneralNews();
+        return Ok(news);
     }
 
 

@@ -2,10 +2,11 @@ using System;
 using API.DTOs;
 using API.Extensions;
 using API.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
-
+[Authorize]
 public class ForumController(IForumRepository forumRepository) : BaseApiController
 {
     [HttpGet("threads")]

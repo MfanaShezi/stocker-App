@@ -84,7 +84,7 @@ public class StockRepository(DataContext context,IMapper mapper) : IStockReposit
 
     public async Task<IEnumerable<StockDto>> GetAllStocksAsync()
     {
-        var query = context.Stocks
+        var query = context.Stocks.Take(20)
         .Include(s => s.Prices.OrderByDescending(p => p.Date).Take(30))
         .Include(s => s.News.OrderByDescending(n => n.Published).Take(5))
         .AsQueryable();
@@ -133,8 +133,14 @@ public class StockRepository(DataContext context,IMapper mapper) : IStockReposit
         return query.ProjectTo<StockDto>(mapper.ConfigurationProvider).FirstOrDefaultAsync();
     }
 
-    public Task<IEnumerable<StockNewsDto>> GetGeneralNews()
+    public Task<List<NewsDto>> GetGeneralNews()
     {
-        throw new NotImplementedException();
+       var query=context.GeneralNews
+        .OrderByDescending(n => n.PublishDate)
+        .Take(20)
+        .AsQueryable();
+
+        return query.ProjectTo<NewsDto>(mapper.ConfigurationProvider).ToListAsync();
+       
     }
 }

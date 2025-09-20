@@ -1,0 +1,390 @@
+<div class="container-fluid p-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="fw-bold">
+          <i class="fas fa-tachometer-alt me-2"></i>
+          Dashboard
+        </h2>
+        <p class="text-muted">Overview of your portfolio and market insights</p>
+      </div>
+    </div>
+  
+    <!-- Portfolio Summary Cards -->
+    <div class="row mb-4">
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6 class="card-title">Portfolio Value</h6>
+                <h4 class="mb-0">${{ getPortfoliovalue() | number:'1.2-2' }}</h4>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-wallet fa-2x opacity-75"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Portfoliio Change Percent -->
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="card text-white" [ngClass]="getPortfolioChange() >= 0 ? 'bg-success' : 'bg-danger'">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6 class="card-title">Today's Change</h6>
+                <h4 class="mb-0">
+                  <i class="fas" [ngClass]="getChangeIcon(getPortfolioChange())"></i>
+                  ${{ getPortfolioChange() | number:'1.2-2' }}
+                </h4>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-chart-line fa-2x opacity-75"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Watchlist count -->
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="card bg-info text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6 class="card-title">Watchlist Items</h6>
+                <h4 class="mb-0">{{ watchlistStocks.length }}</h4>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-eye fa-2x opacity-75"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Active Alerts -->
+      <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="card bg-warning text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6 class="card-title">Active Alerts</h6>
+                <h4 class="mb-0">3</h4>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-bell fa-2x opacity-75"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Charts Row -->
+    <div class="row mb-4">
+      <!-- Portfolio Performance Chart -->
+      <div class="col-lg-8 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-area me-2"></i>
+              Portfolio Performance
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="timeframe-selector mb-3">
+              <label for="timeframe" class="form-label">Time Period:</label>
+              <select 
+                id="timeframe" 
+                class="form-select" 
+                [(ngModel)]="selectedTimeframe" 
+                (change)="onTimeframeChange()">
+                <option *ngFor="let option of timeframeOptions" [value]="option.value">
+                  {{option.label}}
+                </option>
+              </select>
+            </div>
+            <div style="height: 350px; position: relative;">
+              <canvas baseChart
+                      [data]="portfolioChartData"
+                      [options]="portfolioChartOptions"
+                      [type]="portfolioChartType">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Sector Allocation -->
+      <div class="col-lg-4 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-pie me-2"></i>
+              Sector Allocation
+            </h5>
+          </div>
+          <div class="card-body">
+            <div style="height: 350px; position: relative;">
+              <canvas baseChart
+                      [data]="pieChartData"
+                      [options]="sectorChartOptions"
+                      [type]="sectorChartType">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- Exposure Risk Assessment -->
+  <div class="card mb-4" *ngIf="exposureRisks.length > 0">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+        Portfolio Concentration Risks
+      </h6>
+    </div>
+    <div class="card-body">
+      <div *ngFor="let risk of exposureRisks" 
+           class="alert mb-2"
+           [ngClass]="{
+             'alert-warning': risk.riskLevel === 'medium',
+             'alert-danger': risk.riskLevel === 'high'
+           }">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{risk.message}}</strong>
+            <small class="d-block text-muted">
+              {{risk.count}} stocks out of {{watchlistStocks?.length}} total
+            </small>
+          </div>
+          <span class="badge" 
+                [ngClass]="{
+                  'bg-warning': risk.riskLevel === 'medium',
+                  'bg-danger': risk.riskLevel === 'high'
+                }">
+            {{risk.riskLevel | titlecase}} Risk
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- Watchlist and Top Stocks Row -->
+    <div class="row">
+      <!-- Watchlist -->
+      <div class="col-lg-8 mb-3">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="fas fa-star me-2"></i>
+              My Watchlist
+            </h5>
+            <button class="btn btn-sm btn-outline-primary" routerLink="/stocks">
+              <i class="fas fa-plus me-1"></i>
+              Add Stocks
+            </button>
+          </div>
+          <div class="card-body">
+            <div *ngIf="watchlistStocks.length === 0" class="text-center py-4">
+              <i class="fas fa-star fa-3x text-muted mb-3"></i>
+              <h6 class="text-muted">No stocks in watchlist</h6>
+              <p class="text-muted">Add stocks to track their performance</p>
+            </div>
+  
+            <div *ngIf="watchlistStocks.length > 0" class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Change</th>
+                    <th>Score</th>
+                    <th>Signal</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let stock of watchlistStocks">
+                    <td>
+                      <a [routerLink]="['/stocks', stock.id]" class="fw-bold text-decoration-none">
+                        {{ stock.symbol }}
+                      </a>
+                    </td>
+                    <td class="text-truncate" style="max-width: 150px;">{{ stock.name }}</td>
+                    <td>${{ stock.sharePrice | number:'1.2-2' }}</td>
+                    <td [ngClass]="getChangeClass(stock.changePercentage || 0)">
+                      <i class="fas" [ngClass]="getChangeIcon(stock.changePercentage || 0)" style="font-size: 0.8rem;"></i>
+                      {{ stock.changePercentage | number:'1.2-2' }}%
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="getScoreBadgeClass(stockanalysis.calculateStockScore(stock))">
+                        {{ stockanalysis.calculateStockScore(stock) }}/100
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="getSignalBadgeClass(stockanalysis.getBuySignal(stock))">
+                        {{ stockanalysis.getBuySignal(stock) }}
+                      </span>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-danger" (click)="removeFromWatchlist(stock.id || 0)" title="Remove from watchlist">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Top Scoring Stocks -->
+      <div class="col-lg-4 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-trophy me-2"></i>
+              Top Scoring Stocks
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <div *ngFor="let stock of topStocks; let i = index" 
+                   class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+                <div>
+                  <span class="badge bg-secondary me-2">{{ i + 1 }}</span>
+                  <strong>{{ stock.symbol }}</strong>
+                  <br>
+                  <small class="text-muted">{{ stock.name }}</small>
+                </div>
+                <div class="text-end">
+                  <div class="badge bg-success mb-1">{{ stock.score }}/100</div>
+                  <br>
+                  <small class="text-success fw-bold">{{ stock.signal }}</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-3 text-center">
+              <button class="btn btn-sm btn-outline-primary" routerLink="/stocks">
+                <i class="fas fa-external-link-alt me-1"></i>
+                View All Stocks
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <!-- Suggested Stocks -->
+        <!-- <div class="col-lg-4 mb-3">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-trophy me-2"></i>
+                Suggested Stocks
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="list-group list-group-flush">
+                <div *ngFor="let stock of suggestedStocks; let i = index" 
+                     class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+                     <a [class.text-decoration-none]="true" [routerLink]="['/stocks', stock.id]">
+                        <div>
+                          <span class="badge bg-secondary me-2">{{ i + 1 }}</span>
+                          <strong>{{ stock.symbol }}</strong>
+                          <br>
+                          <small class="text-muted">{{ stock.name }}</small>
+                        </div>
+                        <div class="text-end">
+                          <div class="badge bg-success mb-1">{{ stock.sharePrice }}/100</div>
+                          <br>
+                          <small class="text-success fw-bold">{{ this.stockanalysis.getBuySignal(stock) }}</small>
+                        </div>
+                      </a>
+                </div>
+              </div>
+              
+              <div class="mt-3 text-center">
+                <button class="btn btn-sm btn-outline-primary" routerLink="/stocks">
+                  <i class="fas fa-external-link-alt me-1"></i>
+                  View All Stocks
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> -->
+        <!-- Suggested Stocks -->
+<div class="col-lg-4 mb-3">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-magic me-2"></i>
+        Suggested Stocks
+      </h5>
+    </div>
+    <div class="card-body">
+      <!-- No Suggestions -->
+      <div *ngIf="suggestedStocks.length === 0" class="text-center py-4">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h6 class="text-muted">No Suggestions Available</h6>
+        <p class="text-muted small">Update your investment preferences</p>
+      </div>
+
+      <!-- Suggested Stocks List -->
+      <div *ngIf="suggestedStocks.length > 0" class="list-group list-group-flush">
+        <div *ngFor="let stock of suggestedStocks.slice(0, 5); let i = index" 
+             class="list-group-item px-0 border-0 py-2"
+             style="cursor: pointer;"
+             (click)="viewSuggestedStock(stock.id!)">
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <!-- Left side: Rank + Stock Info -->
+            <div class="d-flex align-items-center">
+              <span class="badge bg-primary me-3">{{ i + 1 }}</span>
+              <div>
+                <div class="fw-bold text-primary">{{ stock.symbol }}</div>
+                <small class="text-muted">{{ stock.name }}</small>
+              </div>
+            </div>
+            
+            <!-- Right side: Price + Signal -->
+            <div class="text-end">
+              <div class="badge bg-success mb-1">
+                ${{ stock.sharePrice | number:'1.2-2' }}
+              </div>
+              <br>
+              <!-- <small class="fw-bold" [ngClass]="stockanalysis.getBuySignalClass(stock)">
+                {{ stockanalysis.getBuySignal(stock) }}
+              </small> -->
+            </div>
+          </div>
+          
+          <!-- Optional: Score bar -->
+          <div class="mt-2">
+            <div class="progress" style="height: 4px;">
+              <div class="progress-bar bg-success" 
+                   [style.width.%]="stockanalysis.calculateStockScore(stock)">
+              </div>
+            </div>
+            <small class="text-muted">Score: {{ stockanalysis.calculateStockScore(stock) }}/100</small>
+          </div>
+        </div>
+      </div>
+      
+      <!-- View More Button -->
+      <div class="text-center mt-3" *ngIf="suggestedStocks.length > 0">
+        <button class="btn btn-sm btn-outline-primary" routerLink="/stocks" [queryParams]="{filter: 'Suggested'}">
+          <i class="fas fa-external-link-alt me-1"></i>
+          View All Suggestions
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+      
+
+
+    </div>
+  </div>

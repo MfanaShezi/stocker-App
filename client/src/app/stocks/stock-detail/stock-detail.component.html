@@ -57,7 +57,7 @@
               <p><strong>52W High:</strong> ${{stock.fiftyTwoWeekHigh?.toFixed(2)}}</p>
               <p><strong>52W Low:</strong> ${{stock.fiftyTwoWeekLow?.toFixed(2)}}</p>
               <p><strong>P/E Ratio:</strong> {{stock.peRatio?.toFixed(2)}}</p>
-              <p><strong>Dividend Yield:</strong> {{stock.dividendYield?.toFixed(2)}}%</p>
+              <p><strong>Dividend Yield:</strong> {{stock.hasDividends ? stock.dividendYield?.toFixed(2) + '%' : 'No Dividends'}}</p>
             </div>
           </div>
         </div>
@@ -75,6 +75,257 @@
             <button class="btn btn-outline-info">Set Price Alert</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Investment Analysis Section -->
+<div class="row mt-4" *ngIf="stock">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-chart-line me-2"></i>
+          Investment Analysis
+        </h5>
+      </div>
+      <div class="card-body">
+        <!-- Buy Signal Header -->
+        <div class="analysis-header mb-4" 
+          [ngClass]="stockanalysis.getBuySignalIcon(stock)"
+          [class.text-success]="stockanalysis.getBuySignal(stock) === 'Strong Buy' || stockanalysis.getBuySignal(stock) === 'Buy'"
+          [class.text-warning]="stockanalysis.getBuySignal(stock) === 'Research' || stockanalysis.getBuySignal(stock) === 'Hold'"
+          [class.text-danger]="stockanalysis.getBuySignal(stock) === 'Avoid'">
+          
+          <div class="buy-signal-large" [ngClass]="stockanalysis.getBuySignalClass(stock)">
+            <div class="signal-content">
+              <i class="fas" [ngClass]="stockanalysis.getBuySignalIcon(stock)"></i>
+              <span class="signal-text">{{stockanalysis.getBuySignal(stock) }}</span>
+              <span class="signal-score">{{stockanalysis.calculateStockScore(stock) }}/100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score Breakdown -->
+        <div class="score-breakdown">
+          <h6 class="mb-3">Score Breakdown:</h6>
+          
+          <!-- Core Financial Health -->
+          <div class="breakdown-section mb-3">
+            <div class="section-header">
+              <h6 class="section-title">Core Financial Health (65 pts max)</h6>
+              <span class="section-score">Score{{stockanalysis.getFinancialHealthScore(stock) }}/65</span>
+            </div>
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">ROE: </span>
+                <span class="metric-value">{{stockanalysis.getROEScore(stock) }}/20</span>
+                <small class="metric-detail">({{ stock.roe}}%)</small>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">ROA: </span>
+                <span class="metric-value">{{stockanalysis.getROAScore(stock) }}/15</span>
+                <small class="metric-detail">({{ stock.roa || 'N/A' }}%)</small>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Debt/Equity: </span>
+                <span class="metric-value">{{stockanalysis.getDebtEquityScore(stock) }}/10</span>
+                <small class="metric-detail">({{ stock.totalDebt && stock.bookValue ? (stock.totalDebt / stock.bookValue).toFixed(2) : 'N/A' }})</small>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Current Ratio: </span>
+                <span class="metric-value">{{ stockanalysis.getCurrentRatioScore(stock) }}/10</span>
+                <small class="metric-detail">({{ (stock.totalAssets ?? 0) / (stock.totalDebt ?? 1) || 'N/A' }})</small>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Positive Equity: </span>
+                <span class="metric-value">{{ stockanalysis.getPositiveEquityScore(stock) }}/10</span>
+                <small class="metric-detail">({{ (stock.bookValue ?? 0) > 0 ? 'Yes' : 'No' }})</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Valuation -->
+          <div class="breakdown-section mb-3">
+            <div class="section-header">
+              <h6 class="section-title">Valuation (27 pts max)</h6>
+              <span class="section-score">Score: {{stockanalysis.getValuationScore(stock) }}/27</span>
+            </div>
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">Price-to-Book: </span>
+                <span class="metric-value">{{ stockanalysis.getPriceToBookScore(stock) }}/14</span>
+                <small class="metric-detail">({{ stock.priceToBook || 'N/A' }})</small>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Earnings Yield: </span>
+                <span class="metric-value">{{stockanalysis.getEarningsYieldScore(stock) }}/13</span>
+                <small class="metric-detail">({{stockanalysis.getEarningsYield(stock) }}%)</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quality -->
+          <div class="breakdown-section mb-3">
+            <div class="section-header">
+              <h6 class="section-title">Quality (8 pts max) </h6>
+              <span class="section-score">Score: {{stockanalysis.getQualityScore(stock) }}/8</span>
+            </div>
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">Market Cap: </span>
+                <span class="metric-value">{{stockanalysis.getMarketCapScore(stock) }}/8</span>
+                <small class="metric-detail">({{stockanalysis.formatMarketCap(stock.marketCap ?? 0) }})</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Industry Adjustments -->
+          <div class="breakdown-section mb-3" *ngIf="stockanalysis.getIndustryAdjustments(stock) !== 0">
+            <div class="section-header">
+              <h6 class="section-title">Industry Adjustments </h6>
+              <span class="section-score">{{ stockanalysis.getIndustryAdjustments(stock) > 0 ? '+' : '' }}{{ stockanalysis.getIndustryAdjustments(stock) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Ratios -->
+        <div class="key-ratios mt-4">
+          <h6 class="mb-3">Key Ratios:</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="ratio-item">
+                <span class="ratio-label">P/E Ratio: </span>
+                <span class="ratio-value">{{ stock.peRatio || 'N/A' }}</span>
+              </div>
+              <div class="ratio-item">
+                <span class="ratio-label">Debt-to-Equity: </span>
+                <span class="ratio-value">{{ stock.totalDebt && stock.bookValue ? (stock.totalDebt / stock.bookValue).toFixed(2) : 'N/A' }}</span>
+              </div>
+              <div class="ratio-item">
+                <span class="ratio-label">Current Ratio: </span>
+                <span class="ratio-value">{{ (stock.totalAssets ?? 0) / (stock.totalDebt ?? 1) || 'N/A' }}</span>
+              </div>
+              <div class="ratio-item">
+                <span class="ratio-label">Book Value/Share: </span>
+                <span class="ratio-value">${{ stock.bookValue || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scoring Guide -->
+<div class="row mt-3">
+  <div class="col-12">
+    <div class="card bg-light">
+      <div class="card-body">
+        <h6 class="card-title text-primary">Scoring Guide</h6>
+        <div class="scoring-guide">
+          <div class="guide-item strong-buy">
+            <strong>85-100:</strong> Strong Buy (High conviction)
+          </div>
+          <div class="guide-item buy">
+            <strong>70-84:</strong> Buy (Good opportunity)
+          </div>
+          <div class="guide-item research">
+            <strong>55-69:</strong> Research More (Potential with caveats)
+          </div>
+          <div class="guide-item hold">
+            <strong>40-54:</strong> Hold/Wait (Monitor)
+          </div>
+          <div class="guide-item avoid">
+            <strong>&lt;40:</strong> Avoid (High risk)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- News Carousel Section -->
+<div class="row mt-4" *ngIf="stock && stock.news && stock.news.length > 0">
+  <div class="col-12">
+    <div class="card dark-theme">
+      <div class="card-header cashead" >
+        <h5 class="mb-0 text-white "><i class="fas fa-newspaper me-2 text-white"></i>Latest News</h5>
+      </div>
+      <div class="card-body casbody">
+        <div id="newsCarousel" class="carousel slide casbody" data-bs-ride="carousel">
+          <!-- Carousel Indicators -->
+          <div class="carousel-indicators">
+            <button 
+              *ngFor="let news of stock.news; let i = index" 
+              type="button" 
+              data-bs-target="#newsCarousel" 
+              [attr.data-bs-slide-to]="i" 
+              [class.active]="i === 0"
+              [attr.aria-label]="'Slide ' + (i + 1)">
+            </button>
+          </div>
+          
+          <!-- Carousel Items -->
+          <div class="carousel-inner casbody">
+            <div 
+              *ngFor="let news of stock.news; let i = index" 
+              class="carousel-item"
+              [class.active]="i === 0">
+              <div class="card border-0">
+                <div class="card-body text-center">
+                  <h6 class="card-title">{{news.title}}</h6>
+                  <p class="card-text text-muted mb-2">
+                    <small>Published: {{news.publishedDate| date:'medium'}}</small>
+                  </p>
+                  <a 
+                    [href]="news.url" 
+                    target="_blank" 
+                    class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-external-link-alt me-1"></i>
+                    Read Full Article
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Carousel Controls -->
+          <button 
+            class="carousel-control-prev" 
+            type="button" 
+            data-bs-target="#newsCarousel" 
+            data-bs-slide="prev"
+            *ngIf="stock.news.length > 1">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button 
+            class="carousel-control-next" 
+            type="button" 
+            data-bs-target="#newsCarousel" 
+            data-bs-slide="next"
+            *ngIf="stock.news.length > 1">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- No News Available -->
+<div class="row mt-4" *ngIf="stock && (!stock.news || stock.news.length === 0)">
+  <div class="col-12">
+    <div class="card dark-theme">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Latest News</h5>
+      </div>
+      <div class="card-body text-center">
+        <p class="text-muted">No recent news available for this stock.</p>
       </div>
     </div>
   </div>

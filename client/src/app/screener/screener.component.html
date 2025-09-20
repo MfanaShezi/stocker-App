@@ -208,8 +208,17 @@
           </button>
         </div>
       </div>
-    <!-- Table View -->
-    <div *ngIf="filteredStocks && filteredStocks.length > 0"  class="table-responsive">
+  
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading stocks...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading stocks for screening...</p>
+      </div>
+  
+      <!-- Table View -->
+      <div *ngIf="!isLoading && filteredStocks && filteredStocks.length > 0" class="table-responsive">
         <table class="table table-hover">
           <thead class="table-dark">
             <tr>
@@ -221,62 +230,59 @@
               <th scope="col">Volume</th>
               <th scope="col">Market Cap</th>
               <th scope="col">Sector</th>
-              <th scope="col">Signal</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
-                <tr *ngFor="let stock of filteredStocks; " 
-                    class="table-row"
-                    >
-                <td>
-                    <strong class="text-primary">{{ stock.symbol }}</strong>
-                </td>
-                <td>{{ stock.companyName }}</td>
-                <td>
-                    <strong>${{ stock.currentPrice | number:'1.2-2' }}</strong>
-                </td>
-                <td>
-                    <span [class]="stock.change >= 0 ? 'text-success' : 'text-danger'">
-                    <i [class]="stock.change >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="me-1"></i>
-                    ${{ stock.change | number:'1.2-2' }}
-                    </span>
-                </td>
-                <td>
-                    <span [class]="stock.changePercent >= 0 ? 'text-success' : 'text-danger'">
-                    {{ stock.changePercent | number:'1.2-2' }}%
-                    </span>
-                </td>
-                <td>{{ stock.volume | number }}</td>
-                <td>{{ stock.marketCap }}</td>
-                <td>
-                    <span class="badge bg-secondary">{{ stock.sector }}</span>
-                </td>
-                <td>
-                    <span  class="badge">
-                    {{ stock.signal }}
-                    </span>
-                </td>
-                <td>
-                    <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary" 
-                           (click)="viewStock(stock.symbol)"
-                           title="View Details">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-outline-success"  title="Add to Watchlist">
-                        <i class="fas fa-star"></i>
-                    </button>
-                    </div>
-                </td>
-                </tr>
-            </tbody>
+            <tr *ngFor="let stock of filteredStocks" 
+                class="table-row clickable-row"
+                 (click)="viewStock(stock.id ?? 0)"
+                style="cursor: pointer;">
+              <td>
+                <strong class="text-primary">{{ stock.symbol }}</strong>
+              </td>
+              <td>{{ stock.name || stock.name }}</td>
+              <td>
+                <strong>${{ stock.sharePrice | number:'1.2-2' }}</strong>
+              </td>
+              <td>
+                <span [class]="getChangeClass(stock.changePercentage ?? null)">
+                  <i [class]="getChangeIcon(stock.changePercentage?? null)" class="me-1"></i>
+                  {{ stock.changePercentage | number:'1.2-2' }}
+                </span>
+              </td>
+              <td>
+                <span [class]="getChangeClass(stock.changePercentage ?? null)">
+                  {{ stock.changePercentage | number:'1.2-2' }}%
+                </span>
+              </td>
+              <td>{{ stock.Volume ? (stock.Volume | number) : 'N/A' }}</td>
+              <td>{{ formatMarketCap(stock.marketCap || 0) }}</td>
+              <td>
+                <span class="badge bg-secondary">{{ stock.sector || 'N/A' }}</span>
+              </td>
+              <td (click)="$event.stopPropagation()">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-primary" 
+                         (click)="viewStock(stock.id ?? 0)"
+                         title="View Details">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-success" 
+                         (click)="addToWatchlist(stock.symbol)"
+                         title="Add to Watchlist">
+                    <i class="fas fa-star"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
-      <!-- Results table or cards would go here -->
-      <div class="alert alert-info" *ngIf="!filteredStocks || filteredStocks.length === 0">
+    
+      <!-- No Results Message -->
+      <div class="alert alert-info" *ngIf="!isLoading && (!filteredStocks || filteredStocks.length === 0)">
         <i class="fas fa-info-circle me-2"></i>
-        Apply filters above to screen stocks based on your criteria.
+        {{ allStocks.length === 0 ? 'Loading stocks...' : 'No stocks match your filter criteria. Try adjusting your filters.' }}
       </div>
     </div>
-  </div>

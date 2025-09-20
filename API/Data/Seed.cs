@@ -743,8 +743,40 @@ namespace API.Data
                 }
             }
 
+
+            //Assign investment style to each user
+            for (int i = 0; i < users.Count; i++)
+            {
+                var user = users[i];
+
+                // Assign different investment profiles
+                switch (i)
+                {
+                    case 0: // Conservative investor
+                        user.InvestmentStyle =InvestmentStyle.Conservative;
+                        user.RiskAppetite = RiskAppetite.Low;
+                        user.InvestmentGoal = InvestmentGoal.Retirement;
+                  
+                        break;
+
+                    case 1: // Aggressive investor
+                        user.InvestmentStyle = InvestmentStyle.Aggressive;
+                        user.RiskAppetite = RiskAppetite.High;
+                        user.InvestmentGoal = InvestmentGoal.Growth;
+                      
+                        break;
+
+                    case 2: // Moderate investor
+                        user.InvestmentStyle = InvestmentStyle.Moderate;
+                        user.RiskAppetite = RiskAppetite.Medium;
+                        user.InvestmentGoal = InvestmentGoal.Income;
+                        break;
+                }
+            }
+
+
             // Save changes to the database
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             Console.WriteLine("Users and watchlists seeded successfully.");
         }
 

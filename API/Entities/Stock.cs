@@ -35,8 +35,20 @@ public class Stock
     public decimal? fiftyTwoWeekLow { get; set; }
     public decimal? ChangePercentage { get; set; }
 
+    // Sentiment Analysis Properties
+    public SentimentType? Sentiment { get; set; } // e.g., "Positive", "Negative", "Neutral"
+    public double? SentimentScore { get; set; } // Sentiment score (e.g., -1.0 to 1.0)
+
     public ICollection<StockPrice> Prices { get; set; } = new List<StockPrice>();
     public ICollection<WatchListStock> WatchListStocks { get; set; } = new List<WatchListStock>(); // Many-to-Many relationship
     public ICollection<StockNews> News { get; set; } = new List<StockNews>();
     public ICollection<StockDividend> Dividends { get; set; } = new List<StockDividend>(); // One-to-Many relationship
+}
+
+
+public enum SentimentType
+{
+    Positive,
+    Negative,
+    Neutral
 }

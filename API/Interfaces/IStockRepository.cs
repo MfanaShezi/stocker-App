@@ -17,7 +17,7 @@ public interface IStockRepository
     Task<bool> RemoveFromWatchlistAsync(int stockId, int userId);
     Task<IEnumerable<StockDto>> GetWatchlistAsync(int userId);
 
-    Task<IEnumerable<StockNewsDto>> GetGeneralNews();
+    Task<List<NewsDto>> GetGeneralNews();
 
 
 }

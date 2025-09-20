@@ -10,7 +10,7 @@ public class StockDto
     public string Name { get; set; } = string.Empty;
      public required string Exchange { get; set; }
     public string? Description { get; set; }
-    public string? Industry { get; set; }
+    public string? Region { get; set; }
     public string? Sector { get; set; }
     public decimal? SharePrice { get; set; }
     public DateTime? LastUpdated { get; set; }

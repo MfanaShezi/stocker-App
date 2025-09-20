@@ -61,8 +61,8 @@ using (var scope = app.Services.CreateScope())
         //await seed.SeedStocksAsync();
         // await seed.FetchAndStoreStockDataParallel();
         // await seed.LoadGeneralNews();
-        // await seed.SeedUsersAndWatchlists(userManager);
-        await seed.SeedForumDataAsync();
+       // await seed.SeedUsersAndWatchlists(userManager);
+    await seed.SeedForumDataAsync();
         Console.WriteLine("Seeding completed successfully.\n");
     }
     catch (Exception ex)

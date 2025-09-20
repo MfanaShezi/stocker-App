@@ -1,0 +1,237 @@
+.ratio-display {
+    .ratio-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+  
+      &:last-child {
+        border-bottom: none;
+      }
+  
+      .ratio-label {
+        font-weight: 500;
+        color: #495057;
+      }
+  
+      .ratio-value {
+        font-weight: 600;
+        color: #212529;
+      }
+  
+      .ratio-score {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .carousel-item {
+    min-height: 200px;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 5%;
+  }
+  
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 10px;
+  }
+  
+  .carousel-indicators button {
+    background-color: #007bff;
+  }
+  
+
+
+/* .cashead{ 
+    background: #1a202c;
+    color: #e2e8f0;
+} */
+
+/* .casbody{
+    background: #2d3748;
+    color: #f7fafc;
+} */
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    max-height: 3.2em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+   -webkit-box-orient: vertical;
+  }
+
+  /* Main card dark theme */
+  .card.dark-theme {
+    background: #1e2328;
+    border: 1px solid #2d3748;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Card header dark theme */
+.card.dark-theme .card-header.cashead {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    border-bottom: 1px solid #4a5568;
+    color: #f7fafc;
+}
+
+.card.dark-theme .card-header.cashead h5 {
+    color: #f7fafc !important;
+}
+
+.card.dark-theme .card-header.cashead .fas {
+    color: #63b3ed !important;
+}
+
+/* Card body dark theme */
+.card.dark-theme .card-body.casbody {
+    background: #1e2328;
+    color: #e2e8f0;
+}
+
+/* Carousel inner content */
+.card.dark-theme .carousel-inner.casbody {
+    background: #1e2328;
+}
+
+.card.dark-theme .carousel-item .card {
+    background: transparent;
+    border: none;
+}
+
+.card.dark-theme .carousel-item .card-body {
+    background: transparent;
+    color: #e2e8f0;
+}
+
+/* News title styling */
+.card.dark-theme .card-title {
+    color: #f7fafc;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Published date text */
+.card.dark-theme .text-muted {
+    color: #a0aec0 !important;
+}
+
+/* Read Full Article button */
+.card.dark-theme .btn-outline-primary {
+    color: #63b3ed;
+    border-color: #63b3ed;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.card.dark-theme .btn-outline-primary:hover {
+    background: #63b3ed;
+    color: #1a202c;
+    border-color: #63b3ed;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(99, 179, 237, 0.3);
+}
+
+.card.dark-theme .btn-outline-primary:focus {
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.3);
+}
+
+/* Carousel indicators */
+.card.dark-theme .carousel-indicators button {
+    background-color: #4a5568;
+    border: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 4px;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.card.dark-theme .carousel-indicators button.active {
+    background-color: #63b3ed;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.card.dark-theme .carousel-indicators button:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+/* Carousel controls */
+.card.dark-theme .carousel-control-prev,
+.card.dark-theme .carousel-control-next {
+    width: 5%;
+    opacity: 0.8;
+}
+
+.card.dark-theme .carousel-control-prev-icon,
+.card.dark-theme .carousel-control-next-icon {
+    background-color: rgba(99, 179, 237, 0.8);
+    border-radius: 50%;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.card.dark-theme .carousel-control-prev:hover .carousel-control-prev-icon,
+.card.dark-theme .carousel-control-next:hover .carousel-control-next-icon {
+    background-color: #63b3ed;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(99, 179, 237, 0.4);
+}
+
+/* No news section dark theme */
+.card.dark-theme .card-body .text-muted {
+    color: #a0aec0 !important;
+}
+
+/* Additional enhancements */
+.card.dark-theme {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card.dark-theme .card-header.cashead {
+    border-radius: 12px 12px 0 0;
+}
+
+.card.dark-theme .carousel-item {
+    padding: 20px 0;
+}
+
+/* Smooth transitions */
+.card.dark-theme,
+.card.dark-theme .card-header,
+.card.dark-theme .card-body,
+.card.dark-theme .btn {
+    transition: all 0.3s ease;
+}
+
+/* Optional: Add subtle glow effect */
+.card.dark-theme:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 
+                0 0 0 1px rgba(99, 179, 237, 0.1);
+}
+
+/* Responsive adjustments for dark theme */
+@media (max-width: 768px) {
+    .card.dark-theme .carousel-control-prev,
+    .card.dark-theme .carousel-control-next {
+        width: 8%;
+    }
+    
+    .card.dark-theme .carousel-control-prev-icon,
+    .card.dark-theme .carousel-control-next-icon {
+        padding: 15px;
+    }
+}

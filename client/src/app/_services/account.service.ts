@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { map } from 'rxjs';
 import { User } from '../_models/User';
 import { environment } from '../../environments/environment.development';
+import { StockService } from './stock.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ export class AccountService {
   private http=inject(HttpClient);
   private baseUrl = environment.apiUrl;
   currentUser = signal<User| null>(null);
+  private stockservice = inject(StockService);
 
   login(model: any){
     return this.http.post<User>(this.baseUrl + 'account/login', model).pipe(
@@ -19,6 +21,7 @@ export class AccountService {
           this.setCurrentUser(user);
         }
       })
+       
     )
   }
   
@@ -41,8 +44,10 @@ export class AccountService {
   }
   
   logout(){
+    console.log('Logging out user');
     localStorage.removeItem('user');
     this.currentUser.set(null);
+    this.stockservice.clearWatchlistCache();
   }
   
   

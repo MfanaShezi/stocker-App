@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { AccountService } from '../_services/account.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -9,5 +10,10 @@ import { RouterLink } from '@angular/router';
   styleUrl: './sidenav.component.css'
 })
 export class SidenavComponent {
-
+  accountService = inject(AccountService);
+  private router=inject(Router);
+  logout() {
+    this.accountService.logout();
+    this.router.navigateByUrl('/');
+  }
 }

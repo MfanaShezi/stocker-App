@@ -10,6 +10,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { stock } from '../../_models/stock';
 import { StockService } from '../../_services/stock.service';
+import { StockAnalysisService } from '../../_services/stock-analysis.service';
 
 @Component({
   selector: 'app-stock-detail',
@@ -24,6 +25,7 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
 
   private route = inject(ActivatedRoute);
   private stockService = inject(StockService);
+  public stockanalysis=inject(StockAnalysisService)
   private platformId = inject(PLATFORM_ID);
 
   ngOnInit(): void {
@@ -37,6 +39,7 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
           setTimeout(() => this.loadTradingViewChart(), 100);
         }
         console.log(this.stock);
+        console.log(this.stock?.news)
       },
       error: (error) => console.error(error)
     });

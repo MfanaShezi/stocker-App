@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
-public class DataContext(DbContextOptions<DataContext> options) : IdentityDbContext<User,IdentityRole<int>, int>(options)
+public class DataContext(DbContextOptions<DataContext> options) : IdentityDbContext<User, IdentityRole<int>, int>(options)
 {
     //public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -15,10 +15,10 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
     public DbSet<WatchListStock> WatchListStocks { get; set; }
     public DbSet<StockPrice> StockPrices { get; set; }
     public DbSet<StockNews> StockNews { get; set; }
-    public DbSet<StockDividend> StockDividends { get; set; } 
+    public DbSet<StockDividend> StockDividends { get; set; }
     public DbSet<GeneralNews> GeneralNews { get; set; }
-    
-       // forum entities
+
+    // forum entities
     public DbSet<ForumThread> ForumThreads { get; set; }
     public DbSet<ForumMessage> ForumMessages { get; set; }
 
@@ -31,6 +31,18 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
                 .HasOne(u => u.Watchlist)
                 .WithOne(wl => wl.User)
                 .HasForeignKey<WatchList>(wl => wl.UserId);
+
+        modelBuilder.Entity<User>()
+                .Property(u => u.InvestmentStyle)
+                .HasMaxLength(20);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.RiskAppetite)
+            .HasMaxLength(20);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.InvestmentGoal)
+            .HasMaxLength(50);
 
         // Configure many-to-many relationship between WatchList and Stock
         modelBuilder.Entity<WatchListStock>()
@@ -56,6 +68,15 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
             .Property(s => s.Name)
             .IsRequired()
             .HasMaxLength(100);
+
+        modelBuilder.Entity<Stock>()
+        .Property(s => s.Sentiment)
+        .HasMaxLength(20);
+
+        modelBuilder.Entity<Stock>()
+            .Property(s => s.SentimentScore)
+            .HasColumnType("decimal(5,4)");
+
 
         modelBuilder.Entity<StockPrice>()
         .HasOne(sp => sp.Stock)
@@ -114,7 +135,7 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
            .WithMany()
            .HasForeignKey(fm => fm.UserId)
            .OnDelete(DeleteBehavior.Restrict);
-            
+
         modelBuilder.Entity<ForumMessage>()
             .HasOne(fm => fm.Thread)
             .WithMany(ft => ft.Messages)

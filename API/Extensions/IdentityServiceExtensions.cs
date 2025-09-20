@@ -30,6 +30,7 @@ public static class IdentityServiceExtensions
              .AddJwtBearer(options =>
              {
                  var tokenKey = config["TokenKey"] ?? throw new Exception("TokenKey not found");
+                  Console.WriteLine($"🔑 JWT Configuration - TokenKey: {tokenKey}");
 
                  options.TokenValidationParameters = new TokenValidationParameters
                  {
@@ -52,6 +53,8 @@ public static class IdentityServiceExtensions
                          return Task.CompletedTask;
                      },
                      OnMessageReceived = context =>
+                     
+                     
    {
     var accessToken = context.Request.Query["access_token"];
     var path = context.HttpContext.Request.Path;

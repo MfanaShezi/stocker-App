@@ -1,85 +1,173 @@
 <div class="container-fluid py-4">
-    <!-- Header Section -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <h2 class="mb-3">Stock Market</h2>
-        <div class="d-flex justify-content-between align-items-center">
-          <p class="text-muted mb-0">{{stocks.length}} stocks available</p>
-          <div class="btn-group" role="group">
-            <button class="btn btn-outline-primary btn-sm">All</button>
-            <button class="btn btn-outline-primary btn-sm">Trending</button>
-            <button class="btn btn-outline-primary btn-sm">Top Gainers</button>
-          </div>
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h2 class="mb-1">Stock Market</h2>
+          <p class="text-muted mb-0">
+            {{ filteredStocks.length }} of {{ allStocks.length }} stocks
+            <span *ngIf="activeFilter !== 'all'" class="badge bg-primary ms-2">
+              {{ getFilterLabel(activeFilter) }}
+            </span>
+          </p>
+        </div>
+        
+        <!-- Refresh Button -->
+        <button class="btn btn-outline-primary btn-sm" 
+                (click)="loadStocks()" 
+                [disabled]="isLoading">
+          <i class="fas fa-sync-alt me-1" [class.fa-spin]="isLoading"></i>
+          {{ isLoading ? 'Loading...' : 'Refresh' }}
+        </button>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="filter-section mb-3">
+        <div class="d-flex flex-wrap gap-2">
+          <!-- Main Filters -->
+          <button 
+            *ngFor="let filter of ['all', 'trending', 'gainers', 'losers','Suggested'] as filters"
+            class="btn filter-btn"
+            [class.btn-primary]="activeFilter === filter"
+            [class.btn-outline-primary]="activeFilter !== filter"
+            (click)="applyFilter(filter)">
+            <i [class]="getFilterIcon(filter)" class="me-1"></i>
+            {{ getFilterLabel(filter) }}
+            <span *ngIf="activeFilter === filter" class="badge bg-light text-dark ms-2">
+              {{ filteredStocks.length }}
+            </span>
+          </button>
+        </div>
+        
+        <!-- Sector Filters -->
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          <small class="text-muted align-self-center me-2">Sectors:</small>
+          <button 
+            *ngFor="let filter of ['tech', 'healthcare', 'finance', 'volume'] as sectorFilters"
+            class="btn btn-sm filter-btn"
+            [class.btn-secondary]="activeFilter === filter"
+            [class.btn-outline-secondary]="activeFilter !== filter"
+            (click)="applyFilter(filter)">
+            <i [class]="getFilterIcon(filter)" class="me-1"></i>
+            {{ getFilterLabel(filter) }}
+          </button>
         </div>
       </div>
     </div>
-  
-    <!-- Stock Grid -->
-    <div class="row g-3">
-      <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12  text-dark"
-      *ngFor="let stock of stocks">
-        <div class="card stock-card h-100">
-          <div class="card-body">
-            <!-- Stock Header -->
-           <a [routerLink]="['/stocks', stock.id]" class="text-decoration-none text-dark">
+  </div>
 
+
+
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading stocks...</span>
+    </div>
+    <p class="mt-2 text-muted">Loading stock data...</p>
+  </div>
+
+  <!-- No Results -->
+  <div *ngIf="!isLoading && filteredStocks.length === 0" class="text-center py-5">
+    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">No stocks found</h5>
+    <p class="text-muted">Try adjusting your filter or selecting "All Stocks"</p>
+    <button class="btn btn-primary" (click)="applyFilter('all')">
+      <i class="fas fa-list me-1"></i>
+      Show All Stocks
+    </button>
+  </div>
+
+  <!-- Stock Grid -->
+  <div *ngIf="!isLoading && filteredStocks.length > 0" class="row g-3">
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 text-dark"
+         *ngFor="let stock of filteredStocks; trackBy: trackByStockId">
+      <div class="card stock-card h-100">
+        <div class="card-body">
+          <!-- Stock Header -->
+          <a [routerLink]="['/stocks', stock.id]" class="text-decoration-none text-dark">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
-                <h6 class="card-title mb-1 fw-bold">{{stock.symbol}}</h6>
-                <p class="text-muted small mb-0">{{stock.name}}</p>
+                <h6 class="card-title mb-1 fw-bold">{{ stock.symbol }}</h6>
+                <p class="text-muted small mb-0">{{ stock.name }}</p>
               </div>
-              <span class="badge bg-light text-dark">{{stock.sector}}</span>
+              <span class="badge bg-light text-dark">{{ stock.sector || 'N/A' }}</span>
             </div>
-  
+             <!-- Buy Signal Badge -->
+             <div class="buy-signal-badge" [ngClass]="stockanalysis.getBuySignalClass(stock)">
+              <span class="badge-text">{{ stockanalysis.getBuySignal(stock) }}</span>
+              <span class="badge-score">{{stockanalysis.calculateStockScore(stock) }}/100</span>
+            </div>
+          
+        
+        
+        <!-- Quick Score Bar -->
+        <div class="score-progress mb-2">
+          <div class="progress" style="height: 4px;">
+            <div class="progress-bar" 
+                 [style.width.%]="stockanalysis.calculateStockScore(stock)"
+                 [ngClass]="stockanalysis.getScoreBarClass(stock)">
+            </div>
+          </div>
+        </div>
             <!-- Price Information -->
             <div class="price-section mb-3">
               <div class="d-flex align-items-center justify-content-between">
-                <span class="h5 mb-0 fw-bold">${{stock.sharePrice?.toFixed(2)}}</span>
-                <div class="d-flex align-items-center">
-                  <span [class]="(stock?.changePercentage ?? 0) > 0 ? 'text-success' : 'text-danger'">
-                  {{stock.changePercentage?.toFixed(2)}}   % 
-                </span>
+                <div>
+                  <h5 class="price mb-0">${{ stock.sharePrice | number:'1.2-2' }}</h5>
+                  <div class="price-change" 
+                       [class.text-success]="(stock.changePercentage || 0) >= 0"
+                       [class.text-danger]="(stock.changePercentage || 0) < 0">
+                    <i class="fas" 
+                       [class.fa-arrow-up]="(stock.changePercentage || 0) >= 0"
+                       [class.fa-arrow-down]="(stock.changePercentage || 0) < 0"
+                       class="me-1"></i>
+                    {{ stock.changePercentage | number:'1.2-2'  }}%
+                  </div>
                 </div>
-              </div>
-              <div class="d-flex justify-content-between mt-1">
-                <span class="small text-muted">Volume: {{stock.prices?.[0]?.volume | number}}</span>
-                <span class="small text-muted">Market Cap: {{stock.marketCap | number}}</span>
+                
+                <!-- Volume info -->
+                <div class="text-end" *ngIf="stock.Volume">
+                  <small class="text-muted d-block">Volume</small>
+                  <small class="fw-semibold">{{ stock.Volume | number:'1.0-0' }}</small>
+                </div>
               </div>
             </div>
-  
-            <!-- Quick Stats -->
-            <div class="row text-center">
-              <div class="col-6">
-                <div class="border-end">
-                  <p class="small text-muted mb-0">52W High</p>
-                  <p class="small fw-semibold mb-0">${{stock.fiftyTwoWeekHigh?.toFixed(2)}}</p>
-                </div>
-              </div>
-              <div class="col-6">
-                <p class="small text-muted mb-0">52W Low</p>
-                <p class="small fw-semibold mb-0">${{stock.fiftyTwoWeekLow?.toFixed(2)}}</p>
+
+            <!-- Market Cap -->
+            <div class="market-info" *ngIf="stock.marketCap">
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Market Cap</small>
+                <small class="fw-semibold">{{ formatMarketCap(stock.marketCap) }}</small>
               </div>
             </div>
           </a>
-          </div>
+              <!-- Watchlist Buttons - OUTSIDE the <a> tag -->
+      <div class="card-actions mt-3" (click)="$event.stopPropagation()">
+        <div class="d-flex gap-2">
+          <!-- Add to Watchlist Button - Show when NOT in watchlist -->
+          <button 
+            class="btn btn-outline-success btn-sm flex-grow-1"
+            (click)="addToWatchlist(stock)"
+            title="Add to Watchlist">
+            <i class="fas fa-plus me-1"></i>
+            Add to Watchlist
+          </button>
 
-       
-          <!-- Card Footer -->
-          <div class="card-footer bg-transparent border-top-0 pt-0">
-            <div class="d-grid gap-2 d-md-flex">
-              <button class="btn btn-primary btn-sm flex-fill">Add to Watchlist</button>
-              <button class="btn btn-outline-secondary btn-sm flex-fill">Remove </button>
-            </div>
-          </div>
+          <!-- Remove from Watchlist Button - Show when IN watchlist -->
+          <button 
+            class="btn btn-success btn-sm flex-grow-1"
+            (click)="removeFromWatchlist(stock)"
+            title="Remove from Watchlist">
+            <i class="fas fa-trash me-1"></i>
+              Remove from Watchlist
+          </button>
+
+        
+        </div>
         </div>
       </div>
     </div>
-  
-    <!-- Loading State -->
-    <div *ngIf="stocks.length === 0" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="mt-3 text-muted">Loading stocks...</p>
-    </div>
   </div>
+</div>

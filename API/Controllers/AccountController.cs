@@ -3,6 +3,7 @@ using API.DTOs;
 using API.Entities;
 using API.Interfaces;
 using AutoMapper;
+using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,9 @@ public class AccountController(UserManager<User> userManager, ITokenService toke
         var user = mapper.Map<User>(registerDTO);
         user.UserName = registerDTO.Username.ToLower();
         user.Email = registerDTO.Email.ToLower();
+        user.InvestmentGoal = registerDTO.InvestmentGoal;
+        user.InvestmentStyle = registerDTO.InvestmentStyle;
+        user.RiskAppetite = registerDTO.RiskAppetite;
         var result = await userManager.CreateAsync(user, registerDTO.Password);
         if (!result.Succeeded) return BadRequest(result.Errors);
 
@@ -28,7 +32,10 @@ public class AccountController(UserManager<User> userManager, ITokenService toke
         {
             Username = user.UserName,
             Email = user.Email,
-            Token = await tokenService.CreateToken(user)
+            Token = await tokenService.CreateToken(user),
+            RiskAppetite = (RiskAppetite)(user.RiskAppetite ?? default),
+            InvestmentGoal = (InvestmentGoal)user.InvestmentGoal,
+            InvestmentStyle = (InvestmentStyle)user.InvestmentStyle
 
         };
     }
@@ -47,7 +54,9 @@ public class AccountController(UserManager<User> userManager, ITokenService toke
             Username = user.UserName,
             Email = user.Email!,
             Token = await tokenService.CreateToken(user),
-
+            RiskAppetite = (RiskAppetite)user.RiskAppetite!,
+            InvestmentGoal = (InvestmentGoal)user.InvestmentGoal!,
+            InvestmentStyle = (InvestmentStyle)user.InvestmentStyle!
         };
     }
 

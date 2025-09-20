@@ -19,13 +19,14 @@ public class AutoMapperProfiles : Profile
         CreateMap<StockPrice, StockPriceDto>();
         CreateMap<StockNews, StockNewsDto>();
         CreateMap<StockDividend, StockDividendDto>();
-         CreateMap<ForumThread, ForumThreadDto>()
-                .ForMember(dest => dest.CreatorUsername, opt => opt.MapFrom(src => src.User.UserName));
-                
-            CreateMap<ForumMessage, ForumMessageDto>()
-                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.UserName));
+        CreateMap<ForumThread, ForumThreadDto>()
+               .ForMember(dest => dest.CreatorUsername, opt => opt.MapFrom(src => src.User.UserName));
 
-            CreateMap<CreateThreadDto, ForumThread>();
-            CreateMap<CreateMessageDto, ForumMessage>();
+        CreateMap<ForumMessage, ForumMessageDto>()
+            .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.UserName));
+
+        CreateMap<CreateThreadDto, ForumThread>();
+        CreateMap<CreateMessageDto, ForumMessage>();
+        CreateMap<GeneralNews, NewsDto>();
     }
 }

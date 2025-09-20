@@ -1,18 +1,30 @@
 {
     "cSpell.words": [
+        "authguard",
         "BZVEA",
+        "cachedstocks",
+        "cachedwatchliststocks",
         "CANF",
+        "casbody",
         "Etfs",
         "financials",
         "fontawesome",
         "getstock",
+        "getwatchlist",
         "huburl",
         "Marketaux",
         "PKJXXKY",
+        "Portfoliio",
+        "Portfoliovalue",
+        "registerables",
         "shareprice",
         "Sindy",
+        "stockanalysis",
         "stockservice",
+        "toastr",
+        "userdetails",
         "Watchlist",
-        "watchlists"
+        "watchlists",
+        "watchliststocks"
     ]
 }

@@ -31,8 +31,11 @@ export interface stock{
     fiftyTwoWeekHigh?: number; // 52-week high price
     fiftyTwoWeekLow?: number; // 52-week low price
 
+    Sentiment?: string; // Sentiment (e.g., Positive, Negative, Neutral)
+    SentimentScore?: number; // Sentiment score
+
     prices?: StockPrice[];
-    // news?: StockNews[];
+    news?: StockNews[];
     // dividends?: StockDividend[];
 }
 export interface StockPrice {
@@ -43,4 +46,17 @@ export interface StockPrice {
     low: number;
     close: number;
     volume: number;
+}
+
+export interface StockNews {
+     content: string;
+     id : number;
+     source : string | null;
+     publishedDate : string;
+    title : string;
+    url:string; 
+   
+
+
+
 }

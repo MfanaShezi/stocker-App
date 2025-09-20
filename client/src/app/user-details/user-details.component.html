@@ -1,0 +1,136 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        
+        <!-- Header -->
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+              <i class="fas fa-user-circle me-2"></i>
+              User Profile
+            </h4>
+            <button 
+              class="btn btn-outline-primary" 
+              (click)="toggleEditMode()"
+              *ngIf="!editMode">
+              <i class="fas fa-edit me-1"></i>
+              Edit Profile
+            </button>
+          </div>
+        </div>
+  
+        <!-- User Details Card -->
+        <div class="card" *ngIf="user">
+          <div class="card-body">
+            
+            <!-- View Mode -->
+            <div *ngIf="!editMode">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6 class=" ">Basic Information</h6>
+                  <p><strong>Username:</strong> {{user.username}}</p>
+                  <p><strong>Email:</strong> {{user.email}}</p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class=" ">Investment Profile</h6>
+                  <p><strong>Investment Style:</strong> 
+                    <span class="  ">{{getInvestmentStyleText(user.investmentStyle) || 'Not specified'}}</span>
+                  </p>
+                  <p><strong>Risk Appetite:</strong> 
+                    <span class=" " >{{getRiskAppetiteText(user.riskAppetite) || 'Not specified'}}</span>
+                  </p>
+                  <p><strong>Investment Goal:</strong> 
+                    <span class=" " >{{getInvestmentGoalText(user.investmentGoal) || 'Not specified'}}</span>
+                </p>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Edit Mode -->
+            <div *ngIf="editMode">
+              <form (ngSubmit)="updateUserDetails()">
+                
+                <!-- Investment Profile Section -->
+                <div class="row">
+                  <div class="col-12">
+                    <h6 class="text-muted mb-3">Investment Profile</h6>
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                    <label for="investmentStyle" class="form-label">Investment Style</label>
+                    <select 
+                      id="investmentStyle" 
+                      class="form-select" 
+                      [(ngModel)]="editForm.investmentStyle"
+                      name="investmentStyle">
+                      <option value="" disabled>Select Investment Style</option>
+                      <option *ngFor="let style of investmentStyleOptions" [value]="style">
+                        {{style}}
+                      </option>
+                    </select>
+                  </div>
+  
+                  <div class="col-md-6 mb-3">
+                    <label for="riskAppetite" class="form-label">Risk Appetite</label>
+                    <select 
+                      id="riskAppetite" 
+                      class="form-select" 
+                      [(ngModel)]="editForm.riskAppetite"
+                      name="riskAppetite">
+                      <option value="">Select Risk Level</option>
+                      <option *ngFor="let risk of riskAppetiteOptions" [value]="risk">
+                        {{risk}}
+                      </option>
+                    </select>
+                  </div>
+  
+                  <div class="col-md-6 mb-3">
+                    <label for="investmentGoal" class="form-label">Investment Goal</label>
+                    <select 
+                      id="investmentGoal" 
+                      class="form-select" 
+                      [(ngModel)]="editForm.investmentGoal"
+                      name="investmentGoal">
+                      <option value="">Select Investment Goal</option>
+                      <option *ngFor="let goal of investmentGoalOptions" [value]="goal">
+                        {{goal}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+  
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary" 
+                    (click)="cancelEdit()"
+                    [disabled]="isLoading">
+                    <i class="fas fa-times me-1"></i>
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary" 
+                    [disabled]="isLoading">
+                    <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!isLoading" class="fas fa-save me-1"></i>
+                    {{isLoading ? 'Saving...' : 'Save Changes'}}
+                  </button>
+                </div>
+              </form>
+            </div>
+  
+          </div>
+        </div>
+  
+        <!-- Loading State -->
+        <div class="text-center" *ngIf="!user">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  </div>
