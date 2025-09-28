@@ -9,6 +9,8 @@ import { stock } from '../_models/stock';
 import { AccountService } from '../_services/account.service';
 import { FormsModule } from '@angular/forms';
 import { ExposureRisk } from '../_models/ExposureRisk';
+import { AlertService } from '../_services/alert.service';
+import { PortfolioService } from '../_services/portfolio.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,7 +24,9 @@ export class DashboardComponent implements OnInit {
   public stockanalysis = inject(StockAnalysisService);
   private accountService = inject(AccountService);
   private router = inject(Router);
-
+  alertservice=inject(AlertService);
+  private portfolioService = inject(PortfolioService);
+ 
   suggestedStocks: stock[] = [];
   exposureRisks: ExposureRisk[] = [];
   watchlistStocks: stock[] = [];
@@ -156,6 +160,19 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.loadDashboardData();
     this.loadSuggestedStocks();
+    this.triggerAlerts();
+  }
+
+  triggerAlerts(){
+    this.alertservice.getAlerts().subscribe({
+      next: (alerts) => {
+        console.log('Alerts loaded:', alerts);
+        // Handle the alerts data here
+      },
+      error: (error) => {
+        console.error('Error loading alerts:', error);
+      }
+    });
   }
 
   private loadSuggestedStocks(): void {
@@ -477,5 +494,9 @@ selectedTimeframe: string = '6'; // Default to 6 months
         stock.changePercentage ? counter += stock.changePercentage : 0;
       });
       return counter;
+    }
+
+    canRemove(stock: stock): boolean {
+      return stock !== null && this. stockservice.isInWatchList(stock.symbol);
     }
 }

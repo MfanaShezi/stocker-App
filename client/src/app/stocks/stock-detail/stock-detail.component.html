@@ -71,8 +71,29 @@
         </div>
         <div class="card-body">
           <div class="d-grid gap-2">
-            <button class="btn btn-primary">Add to Watchlist</button>
+            <!-- Add to watchlist -->
+            <button 
+             class="btn btn-outline-primary"
+             [disabled]="!canAdd()"
+             >Add to Watchlist
+            </button>
             <button class="btn btn-outline-info">Set Price Alert</button>
+            <!-- buy button -->
+            <button 
+            class="btn btn-primary btn-sm flex-grow-1"
+            (click)="openBuyModal(stock)"
+            title="Buy Stock">
+            <i class="fas fa-shopping-cart me-1"></i>
+            Buy
+          </button>
+          <!-- sell button  -->
+          <button 
+          class="btn btn-outline-danger btn-sm"
+          [disabled]="!canSell()"
+          (click)="sellAllShares()"
+          title="Sell this purchase">
+          Remove from Portfolio
+        </button>
           </div>
         </div>
       </div>
@@ -219,6 +240,55 @@
   </div>
 </div>
 
+<!-- Sentiment  -->
+<div class="sentiment-section mb-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-chart-line me-2"></i>Sentiment Analysis
+      </h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="sentimentLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading sentiment...</span>
+        </div>
+      </div>
+      
+      <div *ngIf="!sentimentLoading && sentimentData" class="row">
+        <div class="col-md-8">
+          <div id="sentiment-gauge" style="height: 300px;"></div>
+        </div>
+        <div class="col-md-4">
+          <div class="sentiment-info">
+            <h6>Sentiment Details</h6>
+            <div class="mb-2">
+              <strong>Status:</strong> 
+              <span [class]="'badge ms-2 ' + getSentimentBadgeClass(sentimentData.sentiment.sentiment)">
+                {{getSentimentIcon(sentimentData.sentiment.sentiment)}} {{sentimentData.sentiment.sentiment}}
+              </span>
+            </div>
+            <div class="mb-2">
+              <strong>Confidence:</strong> {{(sentimentData.sentiment.confidence * 100).toFixed(1)}}%
+            </div>
+            <div class="mb-2">
+              <strong>Articles:</strong> {{sentimentData.sentiment.articlesProcessed}}/{{sentimentData.sentiment.totalArticles}}
+            </div>
+            <div class="mb-2">
+              <strong>Updated:</strong> {{sentimentData.timestamp | date:'short'}}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="!sentimentLoading && !sentimentData" class="text-center text-muted">
+        <i class="fas fa-exclamation-triangle"></i>
+        Unable to load sentiment data
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Scoring Guide -->
 <div class="row mt-3">
   <div class="col-12">
@@ -337,4 +407,145 @@
     <span class="visually-hidden">Loading...</span>
   </div>
   <p class="mt-3 text-muted">Loading stock details...</p>
+</div>
+
+
+<!-- Buy Stock Modal -->
+<div class="modal fade" [class.show]="showBuyModal" [style.display]="showBuyModal ? 'block' : 'none'" 
+     tabindex="-1" role="dialog" *ngIf="showBuyModal">
+  <div class="modal-backdrop fade show" (click)="closeBuyModal()"></div>
+  
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-shopping-cart me-2"></i>
+          Buy {{ selectedStock?.symbol }}
+        </h5>
+        <button type="button" class="btn-close" (click)="closeBuyModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Stock Information -->
+        <div *ngIf="selectedStock" class="stock-info-section mb-4">
+          <div class="row">
+            <div class="col-md-8">
+              <h6 class="fw-bold">{{ selectedStock.symbol }} - {{ selectedStock.name }}</h6>
+              <p class="text-muted mb-2">{{ selectedStock.name }}</p>
+              <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-light text-dark">{{ selectedStock.sector || 'N/A' }}</span>
+                <div class="price-info">
+                  <span class="fw-bold fs-5">${{ selectedStock.sharePrice | number:'1.2-2' }}</span>
+                  <span class="ms-2" 
+                        [class.text-success]="(selectedStock.changePercentage || 0) >= 0"
+                        [class.text-danger]="(selectedStock.changePercentage || 0) < 0">
+                    <i class="fas" 
+                       [class.fa-arrow-up]="(selectedStock.changePercentage || 0) >= 0"
+                       [class.fa-arrow-down]="(selectedStock.changePercentage || 0) < 0"></i>
+                    {{ selectedStock.changePercentage | number:'1.2-2' }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="buy-signal-display">
+                <div class="signal-badge" [ngClass]="stockanalysis.getBuySignalClass(selectedStock)">
+                  {{ stockanalysis.getBuySignal(selectedStock) }}
+                </div>
+                <small class="text-muted d-block">Score: {{ stockanalysis.calculateStockScore(selectedStock) }}/100</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        <div *ngIf="buySuccess" class="alert alert-success" role="alert">
+          <i class="fas fa-check-circle me-2"></i>
+          {{ buySuccess }}
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="buyError" class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ buyError }}
+        </div>
+
+        <!-- Buy Form -->
+        <form *ngIf="!buySuccess" (ngSubmit)="onBuyStock()" #buyForm="ngForm">
+          <!-- Quantity -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              <i class="fas fa-calculator me-2"></i>
+              Quantity
+            </label>
+            <input 
+              type="number" 
+              class="form-control"
+              [(ngModel)]="buyRequest.quantity"
+              name="quantity"
+              min="1"
+              max="10000"
+              step="1"
+              required>
+            <div class="form-text">Number of shares to purchase</div>
+          </div>
+
+          <!-- Purchase Summary -->
+          <div class="purchase-summary mb-4">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title">
+                  <i class="fas fa-receipt me-2"></i>
+                  Purchase Summary
+                </h6>
+                <div class="row">
+                  <div class="col-6">
+                    <small class="text-muted d-block">Shares</small>
+                    <span class="fw-bold">{{ buyRequest.quantity }}</span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Price per Share</small>
+                    <span class="fw-bold">{{ formatCurrency(selectedStock?.sharePrice || 0) }}</span>
+                  </div>
+                  <div class="col-12 mt-2">
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="fw-bold">Estimated Total:</span>
+                      <span class="fw-bold fs-5 text-primary">{{ formatCurrency(getEstimatedTotal()) }}</span>
+                    </div>
+                  </div>
+                </div>
+                <small class="text-muted mt-2 d-block">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Final price based on historical data for selected date
+                </small>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer" *ngIf="!buySuccess">
+        <button type="button" class="btn btn-secondary" (click)="closeBuyModal()">
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-success"
+          (click)="onBuyStock()"
+          [disabled]="buyLoading || !buyRequest.quantity || buyRequest.quantity <= 0 || (useHistoricalDate && !buyRequest.purchaseDate)">
+          <span *ngIf="buyLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!buyLoading" class="fas fa-shopping-cart me-2"></i>
+          {{ buyLoading ? 'Processing...' : 'Buy Stock' }}
+        </button>
+      </div>
+
+      <div class="modal-footer" *ngIf="buySuccess">
+        <button type="button" class="btn btn-primary" (click)="closeBuyModal()">
+          <i class="fas fa-chart-pie me-2"></i>
+          View Portfolio
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

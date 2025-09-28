@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
+
 [Authorize]
 public class StockController(IStockRepository stockRepository) : BaseApiController
 {
@@ -96,7 +97,7 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
         var stock = await stockRepository.GetStockBySymbolAsync(symbol);
         return Ok(stock);
     }
-    
+
     [HttpGet("news")]
     public async Task<ActionResult<List<NewsDto>>> GetGeneralNews()
     {
@@ -104,5 +105,69 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
         return Ok(news);
     }
 
+    [HttpGet("alerts")]
+    public async Task<ActionResult<IEnumerable<AlertDto>>> GetAlerts()
+    {
+        var userId = User.GetUserId();
+        var alerts = await stockRepository.GetUserAlertsAsync(userId);
+        return Ok(alerts);
+    }
+
+    [HttpGet("alerts/{alertId:int}")]
+    public async Task<ActionResult<AlertDto>> GetAlert(int alertId)
+    {
+        var userId = User.GetUserId();
+        var alert = await stockRepository.GetAlertByIdAsync(alertId, userId);
+
+        if (alert == null)
+            return NotFound("Alert not found");
+
+        return Ok(alert);
+    }
+
+
+    [HttpPost]
+    public async Task<ActionResult<AlertDto>> CreateAlert(CreateAlertDto alertDto)
+    {
+        var userId = User.GetUserId();
+        var alert = await stockRepository.CreateAlertAsync(alertDto, userId);
+        return CreatedAtAction(nameof(GetAlert), new { id = alert.Id }, alert);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateAlert(int id, CreateAlertDto alertDto)
+    {
+        var userId = User.GetUserId();
+        var result = await stockRepository.UpdateAlertAsync(id, alertDto, userId);
+
+        if (!result)
+            return NotFound("Alert not found");
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAlert(int id)
+    {
+        var userId = User.GetUserId();
+        var result = await stockRepository.DeleteAlertAsync(id, userId);
+
+        if (!result)
+            return NotFound("Alert not found");
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/toggle")]
+    public async Task<ActionResult> ToggleAlert(int id)
+    {
+        var userId = User.GetUserId();
+        var result = await stockRepository.ToggleAlertAsync(id, userId);
+
+        if (!result)
+            return NotFound("Alert not found");
+
+        return NoContent();
+    }
 
 }

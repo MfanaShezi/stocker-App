@@ -6,10 +6,17 @@ export interface User{
     investmentGoal:InvestmentGoal;
     investmentStyle:InvestmentStyle;
     riskAppetite:RiskAppetite;
-    InvestmentTimeHorizon?: number;
-    InvestmentBudget?: number;
-    SentimentScore?: number;
  
+}
+export interface RegisterUser{
+    username:string;
+    password:string;
+    ConfirmPassword?:string;
+    email:string;
+    fullName:string;
+    investmentGoal:InvestmentGoal;
+    investmentStyle:InvestmentStyle;
+    riskAppetite:RiskAppetite;
 }
 
 export enum InvestmentStyle {

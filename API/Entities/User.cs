@@ -15,9 +15,8 @@ public class User : IdentityUser<int>
 public enum InvestmentStyle
 {
     Conservative,
-    Moderate,
-    Aggressive,
-    Balanced
+    Balanced,
+    Aggressive
 }
 
 public enum RiskAppetite

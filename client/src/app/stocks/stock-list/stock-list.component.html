@@ -103,14 +103,14 @@
         
         
         <!-- Quick Score Bar -->
-        <div class="score-progress mb-2">
+        <!-- <div class="score-progress mb-2">
           <div class="progress" style="height: 4px;">
             <div class="progress-bar" 
                  [style.width.%]="stockanalysis.calculateStockScore(stock)"
                  [ngClass]="stockanalysis.getScoreBarClass(stock)">
             </div>
           </div>
-        </div>
+        </div> -->
             <!-- Price Information -->
             <div class="price-section mb-3">
               <div class="d-flex align-items-center justify-content-between">
@@ -147,26 +147,237 @@
       <div class="card-actions mt-3" (click)="$event.stopPropagation()">
         <div class="d-flex gap-2">
           <!-- Add to Watchlist Button - Show when NOT in watchlist -->
-          <button 
+          <!-- <button 
             class="btn btn-outline-success btn-sm flex-grow-1"
+            [disabled]="stockservice.isInWatchList(stock.symbol)"
             (click)="addToWatchlist(stock)"
             title="Add to Watchlist">
             <i class="fas fa-plus me-1"></i>
             Add to Watchlist
-          </button>
+          </button> -->
 
           <!-- Remove from Watchlist Button - Show when IN watchlist -->
-          <button 
+          <!-- <button 
             class="btn btn-success btn-sm flex-grow-1"
+            [disabled]="!stockservice.isInWatchList(stock.symbol)"
             (click)="removeFromWatchlist(stock)"
             title="Remove from Watchlist">
             <i class="fas fa-trash me-1"></i>
               Remove from Watchlist
-          </button>
+          </button> -->
+
+          <button 
+          class="btn btn-outline-success btn-sm flex-grow-1"
+          [disabled]="!canAdd(stock) && !canRemove(stock)"
+          (click)="stockservice.isInWatchList(stock.symbol) ? removeFromWatchlist(stock) : addToWatchlist(stock)"
+          title="Toggle Watchlist">
+          <i class="fas" [class.fa-plus]="!stockservice.isInWatchList(stock.symbol)"></i>
+          <span *ngIf="!stockservice.isInWatchList(stock.symbol)">Add to Watchlist</span>
+          <span *ngIf="stockservice.isInWatchList(stock.symbol)">Remove from Watchlist</span>
+        </button>
+
+          <!-- <button 
+          class="btn btn-primary btn-sm flex-grow-1"
+          (click)="openBuyModal(stock)"
+          title="Buy Stock">
+          <i class="fas fa-shopping-cart me-1"></i>
+          Buy
+        </button> -->
 
         
         </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Buy Stock Modal -->
+<div class="modal fade" [class.show]="showBuyModal" [style.display]="showBuyModal ? 'block' : 'none'" 
+     tabindex="-1" role="dialog" *ngIf="showBuyModal">
+  <div class="modal-backdrop fade show" (click)="closeBuyModal()"></div>
+  
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-shopping-cart me-2"></i>
+          Buy {{ selectedStock?.symbol }}
+        </h5>
+        <button type="button" class="btn-close" (click)="closeBuyModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Stock Information -->
+        <div *ngIf="selectedStock" class="stock-info-section mb-4">
+          <div class="row">
+            <div class="col-md-8">
+              <h6 class="fw-bold">{{ selectedStock.symbol }} - {{ selectedStock.name }}</h6>
+              <p class="text-muted mb-2">{{ selectedStock.name }}</p>
+              <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-light text-dark">{{ selectedStock.sector || 'N/A' }}</span>
+                <div class="price-info">
+                  <span class="fw-bold fs-5">${{ selectedStock.sharePrice | number:'1.2-2' }}</span>
+                  <span class="ms-2" 
+                        [class.text-success]="(selectedStock.changePercentage || 0) >= 0"
+                        [class.text-danger]="(selectedStock.changePercentage || 0) < 0">
+                    <i class="fas" 
+                       [class.fa-arrow-up]="(selectedStock.changePercentage || 0) >= 0"
+                       [class.fa-arrow-down]="(selectedStock.changePercentage || 0) < 0"></i>
+                    {{ selectedStock.changePercentage | number:'1.2-2' }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="buy-signal-display">
+                <div class="signal-badge" [ngClass]="stockanalysis.getBuySignalClass(selectedStock)">
+                  {{ stockanalysis.getBuySignal(selectedStock) }}
+                </div>
+                <small class="text-muted d-block">Score: {{ stockanalysis.calculateStockScore(selectedStock) }}/100</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        <div *ngIf="buySuccess" class="alert alert-success" role="alert">
+          <i class="fas fa-check-circle me-2"></i>
+          {{ buySuccess }}
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="buyError" class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ buyError }}
+        </div>
+
+        <!-- Buy Form -->
+        <form *ngIf="!buySuccess" (ngSubmit)="onBuyStock()" #buyForm="ngForm">
+          <!-- Quantity -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              <i class="fas fa-calculator me-2"></i>
+              Quantity
+            </label>
+            <input 
+              type="number" 
+              class="form-control"
+              [(ngModel)]="buyRequest.quantity"
+              name="quantity"
+              min="1"
+              max="10000"
+              step="1"
+              required>
+            <div class="form-text">Number of shares to purchase</div>
+          </div>
+
+          <!-- Purchase Date Options -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              <i class="fas fa-calendar me-2"></i>
+              Purchase Date
+            </label>
+            
+            <div class="form-check mb-2">
+              <input 
+                class="form-check-input" 
+                type="radio" 
+                name="dateOption" 
+                id="earliestDate"
+                [value]="false"
+                [(ngModel)]="useHistoricalDate">
+              <label class="form-check-label" for="earliestDate">
+                <strong>Use Earliest Available Date</strong>
+                <small class="d-block text-muted">Purchase at the beginning of our dataset</small>
+              </label>
+            </div>
+            
+            <div class="form-check mb-3">
+              <input 
+                class="form-check-input" 
+                type="radio" 
+                name="dateOption" 
+                id="specificDate"
+                [value]="true"
+                [(ngModel)]="useHistoricalDate">
+              <label class="form-check-label" for="specificDate">
+                <strong>Choose Specific Date</strong>
+                <small class="d-block text-muted">Select a specific historical date</small>
+              </label>
+            </div>
+
+            <!-- Date Picker -->
+            <div *ngIf="useHistoricalDate">
+              <input 
+                type="date" 
+                class="form-control"
+                [(ngModel)]="buyRequest.purchaseDate"
+                name="purchaseDate"
+                [min]="minDate"
+                [max]="maxDate"
+                required>
+              <div class="form-text">
+                Choose between {{ minDate }} and {{ maxDate }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Purchase Summary -->
+          <div class="purchase-summary mb-4">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title">
+                  <i class="fas fa-receipt me-2"></i>
+                  Purchase Summary
+                </h6>
+                <div class="row">
+                  <div class="col-6">
+                    <small class="text-muted d-block">Shares</small>
+                    <span class="fw-bold">{{ buyRequest.quantity }}</span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Price per Share</small>
+                    <span class="fw-bold">{{ formatCurrency(selectedStock?.sharePrice || 0) }}</span>
+                  </div>
+                  <div class="col-12 mt-2">
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="fw-bold">Estimated Total:</span>
+                      <span class="fw-bold fs-5 text-primary">{{ formatCurrency(getEstimatedTotal()) }}</span>
+                    </div>
+                  </div>
+                </div>
+                <small class="text-muted mt-2 d-block">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Final price based on historical data for selected date
+                </small>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer" *ngIf="!buySuccess">
+        <button type="button" class="btn btn-secondary" (click)="closeBuyModal()">
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-success"
+          (click)="onBuyStock()"
+          [disabled]="buyLoading || !buyRequest.quantity || buyRequest.quantity <= 0 || (useHistoricalDate && !buyRequest.purchaseDate)">
+          <span *ngIf="buyLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!buyLoading" class="fas fa-shopping-cart me-2"></i>
+          {{ buyLoading ? 'Processing...' : 'Buy Stock' }}
+        </button>
+      </div>
+
+      <div class="modal-footer" *ngIf="buySuccess">
+        <button type="button" class="btn btn-primary" (click)="closeBuyModal()">
+          <i class="fas fa-chart-pie me-2"></i>
+          View Portfolio
+        </button>
       </div>
     </div>
   </div>

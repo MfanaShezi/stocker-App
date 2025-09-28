@@ -21,7 +21,8 @@ builder.Services.AddDbContext<DataContext>(opt =>
 builder.Services.AddCors();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
-builder.Services.AddScoped<IForumRepository,ForumRepository>();
+builder.Services.AddScoped<IForumRepository, ForumRepository>();
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 builder.Services.AddSignalR();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddIdentityServices(builder.Configuration);
@@ -61,8 +62,11 @@ using (var scope = app.Services.CreateScope())
         //await seed.SeedStocksAsync();
         // await seed.FetchAndStoreStockDataParallel();
         // await seed.LoadGeneralNews();
-       // await seed.SeedUsersAndWatchlists(userManager);
-    await seed.SeedForumDataAsync();
+        // await seed.SeedUsersAndWatchlists(userManager);
+        //await seed.SeedSentimentParallel();
+        //await seed.SeedForumDataAsync();
+        //await seed.CreateAlertsForUsers();
+       // await seed.SeedPurchases();
         Console.WriteLine("Seeding completed successfully.\n");
     }
     catch (Exception ex)

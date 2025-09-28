@@ -5,13 +5,15 @@ import { StockService } from '../../_services/stock.service';
 import { RouterLink } from '@angular/router';
 import { StockAnalysisService } from '../../_services/stock-analysis.service';
 import { ToastrService } from 'ngx-toastr';
+import { BuyStockRequest, PortfolioService } from '../../_services/portfolio.service';
+import { FormsModule } from '@angular/forms';
 
 type FilterType = 'all' | 'trending' | 'gainers' | 'losers' | 'volume' | 'tech' | 'healthcare' | 'finance'  | 'Suggested';
 
 @Component({
   selector: 'app-stock-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink,FormsModule],
   templateUrl: './stock-list.component.html',
   styleUrl: './stock-list.component.css'
 })
@@ -21,8 +23,9 @@ export class StockListComponent implements OnInit {
   activeFilter: FilterType = 'all';
   isLoading = false;
   private toastr = inject(ToastrService);
+  private portfolioService = inject(PortfolioService);
   
-  private stockservice = inject(StockService);
+  stockservice = inject(StockService);
   public stockanalysis=inject(StockAnalysisService);
 
   filters: FilterType[] = ['all', 'trending', 'gainers', 'losers','Suggested'];
@@ -232,7 +235,135 @@ removeFromWatchlist(stock: stock) {
 isInWatchlist(stockId: number): boolean {
   return this.watchlistStocks.has(stockId);
 }
+//modal 
+showBuyModal = false;
+  selectedStock: stock | null = null;
+  buyRequest: BuyStockRequest = {
+    symbol: '',
+    quantity: 1,
+    purchaseDate: undefined
+  };
+  buyLoading = false;
+  buyError: string | null = null;
+  buySuccess: string | null = null;
+  useHistoricalDate = false;
+  maxDate = new Date().toISOString().split('T')[0];
+  minDate = this.getMinDate();
 
+openBuyModal(stock: stock) {
+  this.selectedStock = stock;
+  this.buyRequest = {
+    symbol: stock.symbol,
+    quantity: 1,
+    purchaseDate: undefined
+  };
+  this.useHistoricalDate = false;
+  this.buyError = null;
+  this.buySuccess = null;
+  this.showBuyModal = true;
+}
+
+closeBuyModal() {
+  this.showBuyModal = false;
+  this.selectedStock = null;
+  this.buyError = null;
+  this.buySuccess = null;
+  this.buyLoading = false;
+}
+
+onBuyStock() {
+  if (!this.selectedStock) return;
+
+  // Validate
+  const validation = this.portfolioService.validatePurchase(this.buyRequest);
+  if (!validation.isValid) {
+    this.buyError = validation.errors.join(', ');
+    return;
+  }
+
+  this.buyLoading = true;
+  this.buyError = null;
+  this.buySuccess = null;
+
+  const request: BuyStockRequest = {
+    symbol: this.buyRequest.symbol.toUpperCase(),
+    quantity: this.buyRequest.quantity,
+    purchaseDate: this.useHistoricalDate ? this.buyRequest.purchaseDate : undefined
+  };
+
+  this.portfolioService.buyStock(request).subscribe({
+    next: (response) => {
+      this.buyLoading = false;
+      this.buySuccess = `Successfully purchased ${response.quantity} shares of ${response.stockSymbol} for ${this.portfolioService.formatCurrency(response.purchaseValue)}`;
+      
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        this.closeBuyModal();
+      }, 2000);
+    },
+    error: (err) => {
+      this.buyLoading = false;
+      this.buyError = err.error?.message || err.error || 'Failed to purchase stock. Please try again.';
+      console.error('Purchase error:', err);
+    }
+  });
+}
+
+getEstimatedTotal(): number {
+  if (!this.selectedStock || !this.buyRequest.quantity) return 0;
+  return (this.selectedStock?.sharePrice ?? 0) * (this.buyRequest.quantity ?? 0);
+}
+
+formatCurrency(value: number): string {
+  return this.portfolioService.formatCurrency(value);
+}
+
+private getMinDate(): string {
+  const date = new Date();
+  date.setDate(date.getDate() - 147);
+  return date.toISOString().split('T')[0];
+}
+
+validatePurchase(request: BuyStockRequest): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!request.symbol || request.symbol.trim() === '') {
+    errors.push('Stock symbol is required');
+  }
+
+  if (!request.quantity || request.quantity <= 0) {
+    errors.push('Quantity must be greater than 0');
+  }
+
+  if (request.quantity && request.quantity > 10000) {
+    errors.push('Maximum quantity is 10,000 shares');
+  }
+
+  if (request.purchaseDate) {
+    const purchaseDate = new Date(request.purchaseDate);
+    const minDate = new Date();
+    minDate.setDate(minDate.getDate() - 147);
+    const maxDate = new Date();
+
+    if (purchaseDate < minDate || purchaseDate > maxDate) {
+      errors.push(`Purchase date must be between ${minDate.toDateString()} and ${maxDate.toDateString()}`);
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
+// Update button state methods
+canAdd(stock: stock): boolean {
+  return stock !== null && !this. stockservice.isInWatchList(stock.symbol);
+}
+
+canRemove(stock: stock): boolean {
+  return stock !== null && this. stockservice.isInWatchList(stock.symbol);
+}
 
 }
 

@@ -92,10 +92,10 @@ def fetch_etf_data(symbol):
                     published = content.get("pubDate")
                     
                     if title and link and published:  # Ensure all required fields are present
-                        data["news"].append({
-                            "title": title,
-                            "link": link,
-                            "published": published,
+                       data["news"].append({
+                        "title": title,
+                        "url": link,  # Changed from 'link' to 'url' to match your model
+                        "publishedDate": published,  # Changed from 'published' to 'publishedDate'
                         })
     except Exception as e:
         print(f"Error fetching news: {e}", file=sys.stderr)

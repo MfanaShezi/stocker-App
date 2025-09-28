@@ -74,8 +74,10 @@ export class StockAnalysisService {
     if (!roe) return 0;
     
     if (roe >= 20) return 20;
-    if (roe >= 15) return 15;
-    if (roe >= 10) return 10;
+    if (roe >= 15) return 18;
+    if (roe >= 10) return 16;
+    if (roe >= 5) return 14;
+    if (roe < 5 ) return 10;
     return 0;
   }
 
@@ -86,6 +88,7 @@ export class StockAnalysisService {
     if (roa >= 15) return 15;
     if (roa >= 8) return 10;
     if (roa >= 5) return 5;
+    if (roa < 5 ) return 2;
     return 0;
   }
 
@@ -95,25 +98,27 @@ export class StockAnalysisService {
     const de = stock.totalDebt / stock.bookValue;
     
     if (de < 0.5) return 10;
-    if (de < 1.0) return 6;
-    if (de < 1.5) return 2;
+    if (de < 1.0) return 8;
+    if (de < 1.5) return 6;
+    if(de >= 1.5) return 4;
     return 0;
   }
 
   getCurrentRatioScore(stock: any): number {
-    if (!stock.totalAssets || !stock.totalDebt || stock.totalDebt <= 0) return 0;
+    if (!stock.totalAssets || !stock.totalDebt || stock.totalDebt <= 0) return 10;
     
     const cr = stock.totalAssets / stock.totalDebt;
     
     if (cr >= 2.0) return 10;
     if (cr >= 1.5) return 6;
     if (cr >= 1.0) return 2;
-    return 0;
+    if (cr < 1.0) return 1;
+    return 10;
   }
 
   getPositiveEquityScore(stock: any): number {
     const equity = stock.bookValue;
-    return (equity && equity > 0) ? 10 : 0;
+    return (equity && equity > 0) ? 10 : 5;
   }
 
   // Valuation Methods
@@ -126,13 +131,15 @@ export class StockAnalysisService {
       if (pb < 3.0) return 14;
       if (pb < 6.0) return 9;
       if (pb < 8.0) return 4;
+      if (pb > 8.0) return 2;
       return 0;
     }
     
     // Standard scoring
     if (pb < 1.0) return 14;
-    if (pb < 2.0) return 9;
-    if (pb < 3.0) return 4;
+    if (pb < 2.0) return 12;
+    if (pb < 3.0) return 10;
+    if (pb > 3.0) return 8;
     return 0;
   }
 
@@ -254,14 +261,18 @@ export class StockAnalysisService {
     else if(InvestmentStyle=== 'Balanced' || RiskAppetite === 'Medium') {
       for(let stock of this.stockservice.stocks() || []){
         console.log('analyzing this user');
-        if((stock.marketCap! >= 2_000_000_000 && stock.marketCap! < 10_000_000_000) || (stock.changePercentage! >= 1 && stock.changePercentage! <= 3) )
+        if((stock.marketCap! >= 2000000000 && stock.marketCap! < 10000000000) || (stock.changePercentage! >= 1 && stock.changePercentage! <= 3) )
         {
            this.suggestedStocks.push(stock);
         }
        }
     }
 
-    return this.suggestedStocks;
+    const uniqueStocks = this.suggestedStocks.filter((stock, index, self) => 
+      index === self.findIndex(s => s.id === stock.id)
+    );
+    return uniqueStocks;
+    //return this.suggestedStocks;
 
   }
 
@@ -270,8 +281,8 @@ export class StockAnalysisService {
     
     switch (value) {
       case 0: return 'Conservative';
-      case 1: return 'Aggressive';
-      case 2: return 'Balanced';
+      case 2: return 'Aggressive';
+      case 1: return 'Balanced';
       default: return 'Not specified';
     }
   }

@@ -193,4 +193,8 @@ export class ScreenerComponent implements OnInit {
     if (!changePercent) return 'fas fa-minus';
     return changePercent >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
   }
+
+  canRemove(stock: stock): boolean {
+    return stock !== null && this. stockService.isInWatchList(stock.symbol);
+  }
 }

@@ -26,8 +26,8 @@ export class UserDetailsComponent implements OnInit {
 
   investmentStyleOptions = [
     'Conservative',
-    'Aggressive',
-    'Balanced'
+    'Balanced',
+    'Aggressive'
   ];
 
   riskAppetiteOptions = [
@@ -124,8 +124,8 @@ export class UserDetailsComponent implements OnInit {
     
     switch (value) {
       case 0: return 'Conservative';
-      case 1: return 'Aggressive';
-      case 2: return 'Balanced';
+      case 1: return 'Balanced';
+      case 2: return 'Aggressive';
       default: return 'Not specified';
     }
   }

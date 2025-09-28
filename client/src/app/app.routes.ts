@@ -10,6 +10,8 @@ import { RegisterComponent } from './register/register.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserDetailsComponent } from './user-details/user-details.component';
 import { authguardGuard } from './_guards/authguard.guard';
+import { AlertComponent } from './Alerts/alert/alert.component';
+import { PortfolioComponent } from './portfolio/portfolio.component';
 
 export const routes: Routes = 
 [
@@ -27,6 +29,8 @@ export const routes: Routes =
             {path: 'screener',component:ScreenerComponent},
             {path :'dashboard',component:DashboardComponent},
             {path: "profile",component:UserDetailsComponent},
+            {path: 'alerts', component:AlertComponent },
+            {path:'portfolio',component:PortfolioComponent}
         ]
     },
     {path:'register',component: RegisterComponent},

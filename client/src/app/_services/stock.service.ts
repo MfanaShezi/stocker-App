@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment.development';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { SentimentResponse } from '../_models/SentimentResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,10 @@ cachedwatchliststocks=new Map();
   // Check if we already have stocks cached in the signal
   const cachedStocks = this.stocks();
   
+  if(cachedStocks && cachedStocks.length > 0) {
+    console.log(' Returning from cache'); 
+    return of(cachedStocks); // Return cached data as Observable
+  }
   if (cachedStocks && cachedStocks.length > 0) {
     console.log(' Returning from cache');
     return of(cachedStocks); // Return cached data as Observable
@@ -37,6 +42,11 @@ cachedwatchliststocks=new Map();
       console.log("Stocks cached:", stocks.length, "items");
     })
   );
+}
+
+clearStockCache() {
+  this.stocks.set([]);
+  console.log("Stock cache cleared");
 }
 
 getwatchlist(): Observable<stock[] | null> {
@@ -78,5 +88,39 @@ clearWatchlistCache() {
   console.log("Watchlist cache cleared");
 }
 
+getstockSentiment(symbol: string): Observable<any> {
+  console.log(`Fetching sentiment for symbol: ${symbol}`);
+  return this.http.get<SentimentResponse>(`https://sentiment-analyser-01hx.onrender.com/api/analyse/${symbol}`);
+}
+
+// isInWatchList(symbol: string): boolean{
+//   if(!this.watchliststocks){
+
+//   }
+//   const watchliststocks = this.watchliststocks();
+
+//   return watchliststocks?.some(stock => stock.symbol === symbol) ?? false;
+// }
+
+isInWatchList(symbol: string): boolean {
+  // If watchlist hasn't been loaded yet, fetch it
+  if ( !this.watchliststocks() || this.watchliststocks()!.length === 0) {
+    console.log('Watchlist not loaded, fetching...');
+    this.getwatchlist().subscribe({
+      next: () => {
+        
+      },
+      error: (err) => {
+        console.error('Error loading watchlist:', err);
+        //this.watchlistLoaded.set(true); // Mark as loaded even on error to avoid infinite loops
+      }
+    });
+    return false; // Return false while loading
+  }
+
+  // Check if symbol is in watchlist
+  const watchlist = this.watchliststocks();
+  return watchlist?.some(s => s.symbol.toUpperCase() === symbol.toUpperCase()) ?? false;
+}
 
 }

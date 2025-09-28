@@ -17,6 +17,8 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
     public DbSet<StockNews> StockNews { get; set; }
     public DbSet<StockDividend> StockDividends { get; set; }
     public DbSet<GeneralNews> GeneralNews { get; set; }
+    public DbSet<Alert> Alerts { get; set; }
+    public DbSet<Purchase> Purchases { get; set; }
 
     // forum entities
     public DbSet<ForumThread> ForumThreads { get; set; }
@@ -141,5 +143,38 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
             .WithMany(ft => ft.Messages)
             .HasForeignKey(fm => fm.ThreadId)
             .OnDelete(DeleteBehavior.Cascade);
+
+
+        //Alert entity
+        modelBuilder.Entity<Alert>()
+       .HasOne(a => a.User)
+       .WithMany()
+       .HasForeignKey(a => a.UserId)
+       .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Alert>()
+            .HasOne(a => a.Stock)
+            .WithMany()
+            .HasForeignKey(a => a.StockId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Alert>()
+            .Property(a => a.TargetPrice)
+            .HasPrecision(18, 2);
+
+        //Purchases
+         modelBuilder.Entity<Purchase>(entity =>
+        {
+            entity.HasOne(p => p.User)
+                  .WithMany()
+                  .HasForeignKey(p => p.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(p => p.Stock)
+                  .WithMany()
+                  .HasForeignKey(p => p.StockSymbol)
+                  .HasPrincipalKey(s => s.Symbol)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

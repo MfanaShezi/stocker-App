@@ -753,21 +753,21 @@ namespace API.Data
                 switch (i)
                 {
                     case 0: // Conservative investor
-                        user.InvestmentStyle =InvestmentStyle.Conservative;
+                        user.InvestmentStyle = InvestmentStyle.Conservative;
                         user.RiskAppetite = RiskAppetite.Low;
                         user.InvestmentGoal = InvestmentGoal.Retirement;
-                  
+
                         break;
 
                     case 1: // Aggressive investor
                         user.InvestmentStyle = InvestmentStyle.Aggressive;
                         user.RiskAppetite = RiskAppetite.High;
                         user.InvestmentGoal = InvestmentGoal.Growth;
-                      
+
                         break;
 
                     case 2: // Moderate investor
-                        user.InvestmentStyle = InvestmentStyle.Moderate;
+                        user.InvestmentStyle = InvestmentStyle.Balanced;
                         user.RiskAppetite = RiskAppetite.Medium;
                         user.InvestmentGoal = InvestmentGoal.Income;
                         break;
@@ -776,7 +776,7 @@ namespace API.Data
 
 
             // Save changes to the database
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             Console.WriteLine("Users and watchlists seeded successfully.");
         }
 
@@ -909,6 +909,381 @@ namespace API.Data
             _context.ForumMessages.AddRange(messages);
             await _context.SaveChangesAsync();
         }
+
+        public async Task SeedSentiment()
+        {
+            var stocks = await _context.Stocks.ToListAsync();
+
+            foreach (var stock in stocks)
+            {
+                var stockNews = await _context.StockNews
+                    .Where(n => n.StockId == stock.Id)
+                    .ToListAsync();
+
+                if (!stockNews.Any())
+                {
+                    Console.WriteLine($"No news found for {stock.Symbol}");
+                    continue;
+                }
+
+                try
+                {
+                    // Prepare news data for Python script
+                    var newsJson = JsonSerializer.Serialize(stockNews.Select(news => new
+                    {
+                        title = news.Title,
+                        publishedDate = news.Published,
+                        url = news.Link
+                    }));
+
+                    // Create temporary file for news data
+                    var tempFile = Path.GetTempFileName();
+                    await File.WriteAllTextAsync(tempFile, newsJson);
+
+                    // Call the Python script with symbol and temp file path
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "py",
+                            Arguments = $"Data/python/sentiment.py {stock.Symbol} {tempFile}",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
+
+                    process.Start();
+
+                    string output = await process.StandardOutput.ReadToEndAsync();
+                    string error = await process.StandardError.ReadToEndAsync();
+
+                    await process.WaitForExitAsync();
+
+                    // Clean up temp file
+                    File.Delete(tempFile);
+
+                    // Filter out the "Device set to use cpu" info message
+                    if (!string.IsNullOrEmpty(error) && !error.Contains("Device set to use cpu"))
+                    {
+                        Console.WriteLine($"Error analyzing sentiment for {stock.Symbol}: {error}");
+                        return;
+                    }
+
+                    // Check if we have valid output
+                    if (string.IsNullOrEmpty(output) || output.Trim().Length == 0)
+                    {
+                        Console.WriteLine($"No output received for {stock.Symbol}");
+                        return;
+                    }
+
+                    Console.WriteLine($"Raw output for {stock.Symbol}: {output}");
+
+                    try
+                    {
+                        // Deserialize the JSON response
+                        var sentimentData = JsonSerializer.Deserialize<SentimentResult>(output, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                        if (sentimentData != null)
+                        {
+                            stock.Sentiment = Enum.TryParse<SentimentType>(sentimentData.Signal, true, out var sentiment) ? sentiment : null;
+                            stock.SentimentScore = sentimentData.Score;
+
+                            Console.WriteLine($"Updated {stock.Symbol}: {sentimentData.Signal} ({sentimentData.Score:F4})");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to deserialize sentiment data for {stock.Symbol}");
+                        }
+                    }
+                    catch (JsonException ex)
+                    {
+                        Console.WriteLine($"JSON parsing error for {stock.Symbol}: {ex.Message}");
+                        Console.WriteLine($"Raw output was: {output}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception processing {stock.Symbol}: {ex.Message}");
+                }
+            }
+
+            // Save all changes at once
+            await _context.SaveChangesAsync();
+            Console.WriteLine("Sentiment analysis completed for all stocks.");
+        }
+        // Parallel processing method for sentiment analysis
+        public async Task SeedSentimentParallel()
+        {
+            var stocks = await _context.Stocks.Take(200).OrderBy(x => x.Id).ToListAsync();
+
+            if (!stocks.Any())
+            {
+                Console.WriteLine("No stocks found for sentiment analysis.");
+                return;
+            }
+
+            Console.WriteLine($"Starting sentiment analysis for {stocks.Count} stocks...");
+
+            // Create semaphore to limit concurrent processes (adjust based on your system)
+            var semaphore = new SemaphoreSlim(5); // Limit to 5 concurrent Python processes
+            var updatedStocks = new ConcurrentBag<(Stock stock, string sentiment, double score)>();
+
+            var tasks = stocks.Select(async stock =>
+            {
+                await semaphore.WaitAsync();
+                try
+                {
+                    var stockNews = await _context.StockNews
+                        .Where(n => n.StockId == stock.Id)
+                        .ToListAsync();
+
+                    if (!stockNews.Any())
+                    {
+                        Console.WriteLine($"No news found for {stock.Symbol}");
+                        return;
+                    }
+
+                    try
+                    {
+                        // Prepare news data for Python script
+                        var newsJson = JsonSerializer.Serialize(stockNews.Select(news => new
+                        {
+                            title = news.Title,
+                            publishedDate = news.Published,
+                            url = news.Link
+                        }));
+
+                        // Create temporary file for news data
+                        var tempFile = Path.GetTempFileName();
+                        await File.WriteAllTextAsync(tempFile, newsJson);
+
+                        // Call the Python script
+                        var process = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
+                            {
+                                FileName = "py",
+                                Arguments = $"Data/python/sentiment.py {stock.Symbol} {tempFile}",
+                                RedirectStandardOutput = true,
+                                RedirectStandardError = true,
+                                UseShellExecute = false,
+                                CreateNoWindow = true
+                            }
+                        };
+
+                        process.Start();
+
+                        string output = await process.StandardOutput.ReadToEndAsync();
+                        string error = await process.StandardError.ReadToEndAsync();
+
+                        await process.WaitForExitAsync();
+
+                        // Clean up temp file
+                        File.Delete(tempFile);
+
+                        // Filter out the "Device set to use cpu" info message
+                        if (!string.IsNullOrEmpty(error) && !error.Contains("Device set to use cpu"))
+                        {
+                            Console.WriteLine($"Error analyzing sentiment for {stock.Symbol}: {error}");
+                            return;
+                        }
+
+                        // Check if we have valid output
+                        if (string.IsNullOrEmpty(output) || output.Trim().Length == 0)
+                        {
+                            Console.WriteLine($"No output received for {stock.Symbol}");
+                            return;
+                        }
+
+                        Console.WriteLine($"Raw output for {stock.Symbol}: {output}");
+
+                        try
+                        {
+                            // Deserialize the JSON response
+                            var sentimentData = JsonSerializer.Deserialize<SentimentResult>(output, new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            });
+
+                            if (sentimentData != null)
+                            {
+                                updatedStocks.Add((stock, sentimentData.Signal, sentimentData.Score));
+                                Console.WriteLine($"✓ Processed {stock.Symbol}: {sentimentData.Signal} ({sentimentData.Score:F4})");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Failed to deserialize sentiment data for {stock.Symbol}");
+                            }
+                        }
+                        catch (JsonException ex)
+                        {
+                            Console.WriteLine($"JSON parsing error for {stock.Symbol}: {ex.Message}");
+                            Console.WriteLine($"Raw output was: {output}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Exception processing {stock.Symbol}: {ex.Message}");
+                    }
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+
+            // Wait for all tasks to complete
+            await Task.WhenAll(tasks);
+
+            // Update all stocks in batch
+            Console.WriteLine($"Updating {updatedStocks.Count} stocks with sentiment data...");
+
+            foreach (var (stock, sentiment, score) in updatedStocks)
+            {
+                stock.Sentiment = Enum.TryParse<SentimentType>(sentiment, true, out var parsedSentiment) ? parsedSentiment : (SentimentType?)null;
+                stock.SentimentScore = score;
+            }
+
+            // Save all changes at once
+            await _context.SaveChangesAsync();
+
+            Console.WriteLine($"Sentiment analysis completed! Updated {updatedStocks.Count} stocks.");
+
+        }
+
+        public async Task CreateAlertsForUsers()
+        {
+            var users = _context.Users.ToList();
+            var stocks = _context.Stocks.Take(10).ToList();
+
+            if (!users.Any())
+            {
+                Console.WriteLine("No users found to create alerts for.");
+                return;
+            }
+
+            if (!stocks.Any())
+            {
+                Console.WriteLine("No stocks found to create alerts for.");
+                return;
+            }
+
+            var random = new Random();
+
+            foreach (var user in users)
+            {
+                // Take 3 stocks for each user to create alerts
+                var userStocks = stocks.Take(3).ToList();
+
+                foreach (var stock in userStocks)
+                {
+                    // Get current price or use a base price
+                    var currentPrice = stock.Prices?.OrderByDescending(p => p.Date)
+                                             .FirstOrDefault()?.Close ?? 100m;
+
+                    // Create price above alert (10-30% above current price)
+                    var abovePrice = currentPrice * (1 + (decimal)(random.NextDouble() * 0.2 + 0.1));
+                    var aboveAlert = new Alert
+                    {
+                        UserId = user.Id,
+                        StockId = stock.Id,
+                        TargetPrice = Math.Round(abovePrice, 2),
+                        AlertType = AlertType.PriceAbove,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow.AddDays(-random.Next(1, 30))
+                    };
+
+                    _context.Alerts.Add(aboveAlert);
+
+                    // Create price below alert (10-30% below current price)
+                    var belowPrice = currentPrice * (1 - (decimal)(random.NextDouble() * 0.2 + 0.1));
+                    var belowAlert = new Alert
+                    {
+                        UserId = user.Id,
+                        StockId = stock.Id,
+                        TargetPrice = Math.Round(belowPrice, 2),
+                        AlertType = AlertType.PriceBelow,
+                        IsActive = random.NextDouble() > 0.3, // 70% chance to be active
+                        CreatedAt = DateTime.UtcNow.AddDays(-random.Next(1, 30))
+                    };
+
+                    _context.Alerts.Add(belowAlert);
+                }
+
+                Console.WriteLine($"Created 6 alerts for user {user.Email}");
+            }
+
+            await _context.SaveChangesAsync();
+            Console.WriteLine("Alerts creation completed successfully.");
+
+        }
+
+        public  async Task SeedPurchases()
+        {
+            if (await _context.Purchases.AnyAsync())
+            {
+                Console.WriteLine("Purchases already exist, skipping seeding.");
+                return;
+            }
+
+            Console.WriteLine("Starting to seed purchases...");
+
+            var users = await _context.Users.ToListAsync();
+            var stocks = await _context.Stocks.Take(10).ToListAsync(); // Get first 10 stocks
+            var random = new Random();
+
+            foreach (var user in users)
+            {
+                Console.WriteLine($"Creating purchases for user {user.Email}");
+
+                // Create 3-5 purchases per user
+                int purchaseCount = random.Next(3, 6);
+
+                for (int i = 0; i < purchaseCount; i++)
+                {
+                    // Select random stock
+                    var randomStock = stocks[random.Next(stocks.Count)];
+
+                    // Get available dates for this stock (our 147-day range)
+                    var availableDates = await _context.StockPrices
+                        .Where(sp => sp.StockId == randomStock.Id)
+                        .OrderBy(sp => sp.Date)
+                        .Select(sp => new { sp.Date, sp.Close })
+                        .ToListAsync();
+
+                    if (availableDates.Any())
+                    {
+                        // Select random date from first half of data (simulate buying earlier)
+                        var maxIndex = Math.Min(availableDates.Count / 2, availableDates.Count - 1);
+                        var randomDateIndex = random.Next(0, maxIndex);
+                        var selectedDate = availableDates[randomDateIndex];
+
+                        // Random quantity between 1-100 shares
+                        var quantity = random.Next(1, 101);
+
+                        var purchase = new Purchase
+                        {
+                            UserId = user.Id,
+                            StockSymbol = randomStock.Symbol,
+                            Quantity = quantity,
+                            PurchasePrice = selectedDate.Close,
+                            PurchaseDate = selectedDate.Date,
+                            PurchaseValue = quantity * selectedDate.Close
+                        };
+
+                        _context.Purchases.Add(purchase);
+                        Console.WriteLine($"  - {quantity} shares of {randomStock.Symbol} at ${selectedDate.Close:F2} on {selectedDate.Date:yyyy-MM-dd}");
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            Console.WriteLine("Purchase seeding completed successfully.");
+        }
     }
-    
 }

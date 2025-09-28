@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "v/eASiY4s7Y=",
+  "dgSpecHash": "3/9FwSJ2bwg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Student\\Documents\\git\\stocker-App\\API\\API.csproj",
+  "projectFilePath": "c:\\Users\\Student\\Documents\\git\\stocker-App\\API\\API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Student\\.nuget\\packages\\alpaca.markets\\7.2.0\\alpaca.markets.7.2.0.nupkg.sha512",
     "C:\\Users\\Student\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",

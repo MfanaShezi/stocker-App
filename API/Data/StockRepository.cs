@@ -8,17 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
-public class StockRepository(DataContext context,IMapper mapper) : IStockRepository
+public class StockRepository(DataContext context, IMapper mapper) : IStockRepository
 {
     public async Task<bool> AddToWatchlist(int stockId, int userId)
     {
-         var existingWatchlist = await context.WatchListStocks
-            .Include(ws => ws.WatchList)
-            .FirstOrDefaultAsync(ws => ws.StockId == stockId && ws.WatchList.UserId == userId);
+        var existingWatchlist = await context.WatchListStocks
+           .Include(ws => ws.WatchList)
+           .FirstOrDefaultAsync(ws => ws.StockId == stockId && ws.WatchList.UserId == userId);
 
         if (existingWatchlist != null)
         {
-           return false; // Already in watchlist
+            return false; // Already in watchlist
         }
 
         // Get or create user's watchlist
@@ -37,7 +37,7 @@ public class StockRepository(DataContext context,IMapper mapper) : IStockReposit
                 User = user
             };
             context.WatchLists.Add(userWatchlist);
-            await context.SaveChangesAsync(); 
+            await context.SaveChangesAsync();
         }
 
         // Add stock to watchlist
@@ -53,19 +53,19 @@ public class StockRepository(DataContext context,IMapper mapper) : IStockReposit
     }
 
     public async Task<IEnumerable<StockDto>> GetWatchlistAsync(int userId)
-{
-    var query = context.WatchListStocks
-        .Include(ws => ws.Stock)
-            .ThenInclude(s => s.Prices.OrderByDescending(p => p.Date).Take(30))
-        .Include(ws => ws.Stock)
-            .ThenInclude(s => s.News.OrderByDescending(n => n.Published).Take(5))
-        .Include(ws => ws.WatchList)
-        .Where(ws => ws.WatchList.UserId == userId)
-        .Select(ws => ws.Stock);
+    {
+        var query = context.WatchListStocks
+            .Include(ws => ws.Stock)
+                .ThenInclude(s => s.Prices.OrderByDescending(p => p.Date).Take(30))
+            .Include(ws => ws.Stock)
+                .ThenInclude(s => s.News.OrderByDescending(n => n.Published).Take(5))
+            .Include(ws => ws.WatchList)
+            .Where(ws => ws.WatchList.UserId == userId)
+            .Select(ws => ws.Stock);
 
-    return await query.ProjectTo<StockDto>(mapper.ConfigurationProvider).ToListAsync();
-}
-    
+        return await query.ProjectTo<StockDto>(mapper.ConfigurationProvider).ToListAsync();
+    }
+
     public async Task<bool> RemoveFromWatchlistAsync(int stockId, int userId)
     {
         var watchlistStock = await context.WatchListStocks
@@ -96,15 +96,15 @@ public class StockRepository(DataContext context,IMapper mapper) : IStockReposit
         var query = context.Stocks
              .Where(s => s.isETF)
              .AsQueryable();
-        
+
         return await query.ProjectTo<StockDto>(mapper.ConfigurationProvider).ToListAsync();
     }
 
     public Task<StockDto?> GetStockByIdAsync(int id)
     {
         var query = context.Stocks.Where(s => s.Id == id)
-        .Include(s => s.Prices.OrderByDescending(p => p.Date).Take(30)) 
-        .Include(s => s.News.OrderByDescending(n => n.Published).Take(5)) 
+        .Include(s => s.Prices.OrderByDescending(p => p.Date).Take(30))
+        .Include(s => s.News.OrderByDescending(n => n.Published).Take(5))
         .AsQueryable();
         return query.ProjectTo<StockDto>(mapper.ConfigurationProvider).FirstOrDefaultAsync();
     }
@@ -117,30 +117,134 @@ public class StockRepository(DataContext context,IMapper mapper) : IStockReposit
 
     public async Task<IEnumerable<StockDto>> GetStockOnly()
     {
-      var query = context.Stocks
-             .Where(s => !s.isETF)
-             .AsQueryable();
-        
+        var query = context.Stocks
+               .Where(s => !s.isETF)
+               .AsQueryable();
+
         return await query.ProjectTo<StockDto>(mapper.ConfigurationProvider).ToListAsync();
     }
 
     public Task<StockDto?> GetStockByIdAsync(string symbol)
     {
-       var query = context.Stocks.Where(s => s.Symbol.ToLower() == symbol.Trim().ToLower())
-        .Include(s => s.Prices.OrderByDescending(p => p.Date).Take(30)) 
-        .Include(s => s.News.OrderByDescending(n => n.Published).Take(5)) 
-        .AsQueryable();
+        var query = context.Stocks.Where(s => s.Symbol.ToLower() == symbol.Trim().ToLower())
+         .Include(s => s.Prices.OrderByDescending(p => p.Date).Take(30))
+         .Include(s => s.News.OrderByDescending(n => n.Published).Take(5))
+         .AsQueryable();
         return query.ProjectTo<StockDto>(mapper.ConfigurationProvider).FirstOrDefaultAsync();
     }
 
     public Task<List<NewsDto>> GetGeneralNews()
     {
-       var query=context.GeneralNews
-        .OrderByDescending(n => n.PublishDate)
-        .Take(20)
-        .AsQueryable();
+        var query = context.GeneralNews
+         .OrderByDescending(n => n.PublishDate)
+         .Take(20)
+         .AsQueryable();
 
         return query.ProjectTo<NewsDto>(mapper.ConfigurationProvider).ToListAsync();
-       
+
     }
+
+    public async Task<IEnumerable<AlertDto>> GetUserAlertsAsync(int userId)
+    {
+        return await context.Alerts
+            .Where(a => a.UserId == userId)
+            .Include(a => a.Stock)
+            .Select(a => new AlertDto
+            {
+                Id = a.Id,
+                StockId = a.StockId,
+                StockSymbol = a.Stock!.Symbol,
+                StockName = a.Stock.Name,
+                TargetPrice = a.TargetPrice,
+                AlertType = a.AlertType.ToString(),
+                IsActive = a.IsActive,
+                CreatedAt = a.CreatedAt,
+                TriggeredAt = a.TriggeredAt
+            })
+            .OrderByDescending(a => a.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<AlertDto?> GetAlertByIdAsync(int alertId, int userId)
+    {
+        return await context.Alerts
+            .Where(a => a.Id == alertId && a.UserId == userId)
+            .Include(a => a.Stock)
+            .Select(a => new AlertDto
+            {
+                Id = a.Id,
+                StockId = a.StockId,
+                StockSymbol = a.Stock!.Symbol,
+                StockName = a.Stock.Name,
+                TargetPrice = a.TargetPrice,
+                AlertType = a.AlertType.ToString(),
+                IsActive = a.IsActive,
+                CreatedAt = a.CreatedAt,
+                TriggeredAt = a.TriggeredAt
+            })
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<AlertDto> CreateAlertAsync(CreateAlertDto alertDto, int userId)
+    {
+        var alert = new Alert
+        {
+            UserId = userId,
+            StockId = alertDto.StockId,
+            TargetPrice = alertDto.TargetPrice,
+            AlertType = Enum.Parse<AlertType>(alertDto.AlertType!)
+        };
+
+        context.Alerts.Add(alert);
+        await context.SaveChangesAsync();
+
+        return await GetAlertByIdAsync(alert.Id, userId);
+    }
+
+    public async Task<bool> UpdateAlertAsync(int alertId, CreateAlertDto alertDto, int userId)
+    {
+        var alert = await context.Alerts
+            .FirstOrDefaultAsync(a => a.Id == alertId && a.UserId == userId);
+
+        if (alert == null) return false;
+
+        alert.TargetPrice = alertDto.TargetPrice;
+        alert.AlertType = Enum.Parse<AlertType>(alertDto.AlertType);
+
+        return await context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteAlertAsync(int alertId, int userId)
+    {
+        var alert = await context.Alerts
+            .FirstOrDefaultAsync(a => a.Id == alertId && a.UserId == userId);
+
+        if (alert == null) return false;
+
+        context.Alerts.Remove(alert);
+        return await context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> ToggleAlertAsync(int alertId, int userId)
+    {
+        var alert = await context.Alerts
+            .FirstOrDefaultAsync(a => a.Id == alertId && a.UserId == userId);
+
+        if (alert == null) return false;
+
+        alert.IsActive = !alert.IsActive;
+        return await context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<IEnumerable<Alert>> GetActiveAlertsAsync()
+    {
+        return await context.Alerts
+            .Where(a => a.IsActive)
+            .Include(a => a.Stock)
+            .Include(a => a.User)
+            .ToListAsync();
+    }
+
+
+
 }
