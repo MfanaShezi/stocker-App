@@ -81,6 +81,7 @@
                       <div class="btn-group btn-group-sm">
                         <button 
                           class="btn btn-outline-primary"
+                          (click)="openEditForm(alert)"
                           title="Edit">
                           <i class="fas fa-edit"></i>
                         </button>
@@ -113,3 +114,95 @@
       </div>
     </div>
   </div>
+
+  <div class="modal" [class.show]="showEditForm" [style.display]="showEditForm ? 'block' : 'none'" 
+     tabindex="-1" role="dialog" *ngIf="showEditForm" (click)="closeEditForm()">
+  
+  <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-edit me-2"></i>
+          Edit Price Alert
+        </h5>
+        <button type="button" class="btn-close" (click)="closeEditForm()"></button>
+      </div>
+
+      <form (ngSubmit)="updateAlert()" #editForm="ngForm">
+        <div class="modal-body">
+          <!-- Success Message -->
+          <div *ngIf="editSuccess" class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            Alert updated successfully!
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="editError" class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ editError }}
+          </div>
+
+          <!-- Stock Symbol -->
+          <div class="mb-3">
+            <label for="editSymbol" class="form-label">Stock Symbol</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="editSymbol"
+              [(ngModel)]="editAlert.stockSymbol" 
+              name="symbol"
+              required
+              readonly
+              placeholder="Enter stock symbol">
+             <div class="form-text">
+                Stock symbol cannot be changed. Create a new alert for different stocks.
+             </div>
+          </div>
+
+          <!-- Alert Type -->
+          <div class="mb-3">
+            <label for="editAlertType" class="form-label">Alert Type</label>
+            <select 
+              class="form-select" 
+              id="editAlertType"
+              [(ngModel)]="editAlert.alertType" 
+              name="alertType"
+              required>
+              <option value="PriceAbove">Alert when price goes above</option>
+              <option value="PriceBelow">Alert when price goes below</option>
+            </select>
+          </div>
+
+          <!-- Target Price -->
+          <div class="mb-3">
+            <label for="editTargetPrice" class="form-label">Target Price ($)</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="editTargetPrice"
+              [(ngModel)]="editAlert.targetPrice" 
+              name="targetPrice"
+              required
+              min="0.01"
+              step="0.01"
+              placeholder="Enter target price">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeEditForm()">
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="editLoading || !editForm.form.valid">
+              <span *ngIf="editLoading" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!editLoading" class="fas fa-save me-2"></i>
+              Update Alert
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -4,13 +4,14 @@ import { StockAnalysisService } from '../_services/stock-analysis.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartData, ChartType, TooltipItem, ChartTypeRegistry } from 'chart.js';
 import { stock } from '../_models/stock';
 import { AccountService } from '../_services/account.service';
 import { FormsModule } from '@angular/forms';
 import { ExposureRisk } from '../_models/ExposureRisk';
 import { AlertService } from '../_services/alert.service';
 import { PortfolioService } from '../_services/portfolio.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,27 +27,27 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   alertservice=inject(AlertService);
   private portfolioService = inject(PortfolioService);
+  private toastr = inject(ToastrService);
  
   suggestedStocks: stock[] = [];
   exposureRisks: ExposureRisk[] = [];
   watchlistStocks: stock[] = [];
   topStocks: any[] = [];
-  portfolioSummary = {
-    totalValue: 0,
-    todayChange: 0,
-    todayChangePercent: 0,
-    PortfolioValue: 0
-  };
-
-  riskThreshold = {
-    sectorMax: 30, // Max 30% in one sector
-    sectorRegionMax: 20 // Max 20% in same sector + region combo
-  };
-
+  selectedTimeframe: string = '3';
+   
   isLoading = true;
 
-  // Portfolio Line Chart
-  public portfolioChartData: ChartData<'line'> = {
+  ngOnInit() {
+    this.loadDashboardData();
+    this.loadSuggestedStocks();
+    this.triggerAlerts();
+    this.updateChartData();
+  }
+
+  // watchlist  Line Chart
+  public portfolioChartType: ChartType = 'line';
+
+  public lineChartData: ChartData<'line'> = {
     labels: [],
     datasets: [
       {
@@ -63,20 +64,159 @@ export class DashboardComponent implements OnInit {
       }
     ]
   };
+  updateChartData() {
+    if (!this.watchlistStocks || this.watchlistStocks.length === 0) {
+      this.lineChartData = {
+        labels: [],
+        datasets: []
+      };
+      return;
+    }
 
-  public portfolioChartOptions: ChartConfiguration['options'] = {
+    const startDate = this.getStartDate();
+    const endDate = new Date();
+    
+    // Collect all unique dates across all stocks
+    const allPriceDates = new Set<string>();
+    this.watchlistStocks.forEach(stock => {
+      if (stock.prices) {
+        stock.prices.forEach(price => {
+          const priceDate = new Date(price.date);
+          if (priceDate >= startDate && priceDate <= endDate) {
+            allPriceDates.add(price.date);
+          }
+        });
+      }
+    });
+    
+    // Sort dates
+    const sortedDates = Array.from(allPriceDates).sort();
+    
+    // Sample dates for chart (to avoid too many data points)
+    const sampleInterval = this.getSampleInterval();
+    const sampledDates: string[] = [];
+    for (let i = 0; i < sortedDates.length; i += sampleInterval) {
+      sampledDates.push(sortedDates[i]);
+    }
+    
+    // Create datasets for each stock
+    const datasets = this.watchlistStocks.map((stock, index) => {
+      const data = sampledDates.map(date => {
+        if (stock.prices) {
+          const priceOnDate = stock.prices.find(p => p.date === date);
+          return priceOnDate ? priceOnDate.close : null;
+        }
+        return null;
+      });
+      
+      // Generate colors for each stock line
+      const colors = this.getChartColors();
+      
+      return {
+        label: stock.symbol,
+        data: data,
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length] + '20', // Add transparency
+        fill: false,
+        tension: 0.1,
+        pointRadius: 2,
+        pointHoverRadius: 4
+      };
+    });
+    
+    // Format dates for labels
+    const labels = sampledDates.map(date => {
+      const dateObj = new Date(date);
+      return dateObj.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: this.selectedTimeframe === '1Y' || this.selectedTimeframe === '2Y' ? '2-digit' : undefined
+      });
+    });
+    
+    this.lineChartData = {
+      labels: labels,
+      datasets: datasets
+    };
+  }
+
+  // Helper method to get sample interval based on timeframe
+  private getSampleInterval(): number {
+    const timeframe = parseInt(this.selectedTimeframe);
+    if (timeframe <= 1) return 1; // Daily for 1 month
+    if (timeframe <= 3) return 2; // Every other day for 3 months
+    if (timeframe <= 6) return 5; // Every 5 days for 6 months
+    return 10; // Every 10 days for longer periods
+  }
+
+  getStartDate(): Date {
+    // Calculate the desired start date based on timeframe
+    const timeframe = parseInt(this.selectedTimeframe);
+    const endDate = new Date();
+    const desiredStartDate = new Date();
+    desiredStartDate.setMonth(endDate.getMonth() - timeframe);
+  
+    // Find the earliest available date across all watchlist stocks
+    let earliestAvailableDate: Date | null = null;
+    
+    if (this.watchlistStocks && this.watchlistStocks.length > 0) {
+      this.watchlistStocks.forEach(stock => {
+        if (stock.prices && stock.prices.length > 0) {
+          // Sort prices by date (ascending)
+          stock.prices.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          
+          // Get the earliest date for this stock
+          const stockEarliestDate = new Date(stock.prices[0].date);
+          
+          // Update overall earliest date
+          if (!earliestAvailableDate || stockEarliestDate < earliestAvailableDate) {
+            earliestAvailableDate = stockEarliestDate;
+          }
+        }
+      });
+    }
+    return desiredStartDate;
+  }
+  // Helper method to get chart colors
+  private getChartColors(): string[] {
+    return [
+      '#FF6384', // Red
+      '#36A2EB', // Blue
+      '#FFCE56', // Yellow
+      '#4BC0C0', // Teal
+      '#9966FF', // Purple
+      '#FF9F40', // Orange
+      '#FF6384', // Pink
+      '#C9CBCF', // Grey
+      '#4BC0C0', // Light Blue
+      '#FF6384'  // Dark Red
+    ];
+  }
+
+  // Update chart options for multiple lines
+  public lineChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false
+        display: true,
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: {
+            size: 12
+          }
+        }
       },
       tooltip: {
         mode: 'index',
         intersect: false,
         callbacks: {
-          label: (context) => {
-            return `Portfolio Value: $${context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          label: function(tooltipItem: TooltipItem<ChartType>) {
+            const label = tooltipItem.dataset.label || 'Unknown';
+            const value = tooltipItem.parsed.y !== undefined ? tooltipItem.parsed.y.toFixed(2) : 'N/A';
+            return `${label}: $${value}`;
           }
         }
       }
@@ -84,18 +224,26 @@ export class DashboardComponent implements OnInit {
     scales: {
       x: {
         display: true,
-        grid: {
-          display: false
+        title: {
+          display: true,
+          text: 'Date'
+        },
+        ticks: {
+          maxTicksLimit: 10
         }
       },
       y: {
         display: true,
-        grid: {
-          color: '#ebedef'
+        title: {
+          display: true,
+          text: 'Price ($)'
         },
         ticks: {
-          callback: (value) => {
-            return '$' + Number(value).toLocaleString();
+          callback: function(tickValue: string | number) {
+            if (typeof tickValue === 'number') {
+              return '$' + tickValue.toFixed(2);
+            }
+            return tickValue; // Return as-is if not a number
           }
         }
       }
@@ -107,9 +255,71 @@ export class DashboardComponent implements OnInit {
     }
   };
 
-  public portfolioChartType: ChartType = 'line';
+  updateChartOptions() {
+    this.lineChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            padding: 20,
+            font: {
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            label: function(tooltipItem: TooltipItem<keyof ChartTypeRegistry>) {
+              const label = tooltipItem.dataset.label || 'Unknown';
+              const value = tooltipItem.parsed.y !== undefined ? tooltipItem.parsed.y.toFixed(2) : 'N/A';
+              return `${label}: $${value}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Date'
+          },
+          ticks: {
+            maxTicksLimit: 10
+          }
+        },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Price ($)'
+          },
+          ticks: {
+            callback: function(tickValue: string | number) {
+              if (typeof tickValue === 'number') {
+                return '$' + tickValue.toFixed(2);
+              }
+              return tickValue; // Return as-is if not a number
+            }
+          }
+        }
+      },
+      interaction: {
+        mode: 'nearest',
+        axis: 'x',
+        intersect: false
+      }
+    };
+  }
 
 
+//donut chart for sectors
 
   public sectorChartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -157,11 +367,6 @@ export class DashboardComponent implements OnInit {
     ]
   };
 
-  ngOnInit() {
-    this.loadDashboardData();
-    this.loadSuggestedStocks();
-    this.triggerAlerts();
-  }
 
   triggerAlerts(){
     this.alertservice.getAlerts().subscribe({
@@ -250,9 +455,6 @@ export class DashboardComponent implements OnInit {
       acc[key] = (acc[key] || 0) + 1;
       return acc;
     }, {});
-  
-
-
 
     // Create labels with percentages
   const labelsWithPercentages = Object.keys(sectorCounts).map(sector => {
@@ -263,45 +465,8 @@ export class DashboardComponent implements OnInit {
 
   this.pieChartData.labels = labelsWithPercentages;
   this.pieChartData.datasets[0].data = Object.values(sectorCounts);
-    
-      // Assess exposure risks (sector and sector-region only)
-  this.assessExposureRisks(sectorCounts, sectorRegionCounts, totalStocks);
   }
-  assessExposureRisks(sectorCounts: any, sectorRegionCounts: any, totalStocks: number) {
-    this.exposureRisks = [];
-  
-    // Check sector concentration
-    Object.entries(sectorCounts).forEach(([sector, count]: [string, any]) => {
-      const percentage = (count / totalStocks) * 100;
-      if (percentage > this.riskThreshold.sectorMax) {
-        this.exposureRisks.push({
-          type: 'sector',
-          category: sector,
-          percentage: Math.round(percentage),
-          count,
-          riskLevel: percentage > 50 ? 'high' : 'medium',
-          message: `${percentage.toFixed(1)}% concentration in ${sector} sector`
-        });
-      }
-    });
-  
-    // Check sector-region combination
-    // Object.entries(sectorRegionCounts).forEach(([combo, count]: [string, any]) => {
-    //   const percentage = (count / totalStocks) * 100;
-    //   if (percentage > this.riskThreshold.sectorRegionMax) {
-    //     this.exposureRisks.push({
-    //       type: 'sector-region',
-    //       category: combo,
-    //       percentage: Math.round(percentage),
-    //       count,
-    //       riskLevel: percentage > 35 ? 'high' : 'medium',
-    //       message: `${percentage.toFixed(1)}% concentration in ${combo}`
-    //     });
-    //   }
-    // });
-  
-    console.log('Exposure risks identified:', this.exposureRisks);
-  }
+
   loadTopStocks() {
     console.log('Loading top performing stocks...');
   this.stockservice.getAllStocks().subscribe({
@@ -328,8 +493,6 @@ export class DashboardComponent implements OnInit {
     }
   });
   }
-
-selectedTimeframe: string = '6'; // Default to 6 months
   timeframeOptions = [
     { value: '3', label: '3 Months' },
     { value: '6', label: '6 Months' },
@@ -338,12 +501,6 @@ selectedTimeframe: string = '6'; // Default to 6 months
   ];
 
   generatePortfolioData() {
-    // if (!this.watchlistStocks || this.watchlistStocks.length === 0) {
-    //   // Fallback to mock data if no watchlist
-    //   this.generateMockPortfolioData();
-    //   return;
-    // }
-  
     // Calculate portfolio performance based on actual stock prices
     const dates: string[] = [];
     const values: number[] = [];
@@ -395,22 +552,6 @@ selectedTimeframe: string = '6'; // Default to 6 months
       dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
       values.push(Math.round(portfolioValues[i] * 100) / 100);
     }
-  
-  
-    this.portfolioChartData = {
-      labels: dates,
-      datasets: [
-        {
-          data: values,
-          label: 'Portfolio Value',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.1
-        }
-      ]
-    };
     
     console.log('Portfolio performance updated with real data:', { dates: dates.length, values: values.length });
   }
@@ -418,46 +559,20 @@ selectedTimeframe: string = '6'; // Default to 6 months
   onTimeframeChange() {
     this.generatePortfolioData();
   }
-  generateMockPortfolioData() {
-    // Fallback method when no real data is available
-    const dates = [];
-    const values = [];
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - 6);
-  
-    let baseValue = 10000;
-    
-    for (let i = 0; i < 180; i++) {
-      const date = new Date(startDate);
-      date.setDate(date.getDate() + i);
-      
-      const dailyReturn = (Math.random() - 0.45) * 0.03;
-      baseValue *= (1 + dailyReturn);
-      
-      if (i % 7 === 0) {
-        dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        values.push(Math.round(baseValue * 100) / 100);
-      }
-    }
-  
-    this.portfolioChartData = {
-      labels: dates,
-      datasets: [
-        {
-          data: values,
-          label: 'Portfolio Value',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.1
-        }
-      ]
-    };
-  }
 
-  removeFromWatchlist(stockId: number) {
-    this.watchlistStocks = this.watchlistStocks.filter(stock => stock.id !== stockId);
+  removeFromWatchlist(stock: stock) {
+    this.stockservice.removeFromWatchlist(stock.id!).subscribe({
+      next: (response) => {
+        console.log('Successfully removed from watchlist:', stock.symbol);
+        this.watchlistStocks = this.watchlistStocks.filter(s => s.id !== stock.id);
+        this.toastr.success(`${stock.symbol} removed from watchlist`);
+      },
+      error: (error) => {
+        console.error('Error removing from watchlist:', error);
+        this.toastr.error('Failed to remove from watchlist');
+      }
+    })
+    console.log('Removing from watchlist:', stock.symbol);
   }
 
   getChangeClass(changePercentage: number): string {

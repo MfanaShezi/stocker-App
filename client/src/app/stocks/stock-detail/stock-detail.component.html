@@ -77,7 +77,9 @@
              [disabled]="!canAdd()"
              >Add to Watchlist
             </button>
-            <button class="btn btn-outline-info">Set Price Alert</button>
+            <button class="btn btn-outline-info"
+            (click)="openAlertModal()"
+            >Set Price Alert</button>
             <!-- buy button -->
             <button 
             class="btn btn-primary btn-sm flex-grow-1"
@@ -549,3 +551,100 @@
     </div>
   </div>
 </div>
+
+<!-- Set Alert Modal -->
+<div class="modal" [class.show]="showAlertModal" [style.display]="showAlertModal ? 'block' : 'none'" 
+     tabindex="-1" role="dialog" *ngIf="showAlertModal" (click)="closeAlertModal()">
+  
+  <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-bell-fill me-2 text-warning"></i>
+          Set Price Alert for {{ stock?.symbol }}
+        </h5>
+        <button type="button" class="btn-close" (click)="closeAlertModal()"></button>
+      </div>
+
+      <form (ngSubmit)="createAlert()" #alertForm="ngForm">
+        <div class="modal-body">
+          <!-- Success Message -->
+          <div *ngIf="alertSuccess" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            Alert created successfully!
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="alertError" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ alertError }}
+          </div>
+
+          <!-- Current Price Info -->
+          <div class="alert alert-info" *ngIf="stock">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Current price: <strong>{{ formatCurrency(stock.sharePrice || 0) }}</strong>
+          </div>
+
+          <!-- Alert Type -->
+          <div class="mb-3">
+            <label for="alertType" class="form-label">Alert Type</label>
+            <select 
+              class="form-select" 
+              id="alertType"
+              [(ngModel)]="alertRequest.alertType" 
+              name="alertType"
+              required>
+              <option value="PriceAbove">Alert when price goes above</option>
+              <option value="PriceBelow">Alert when price goes below</option>
+            </select>
+          </div>
+
+          <!-- Target Price -->
+          <div class="mb-3">
+            <label for="targetPrice" class="form-label">Target Price ($)</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="targetPrice"
+              [(ngModel)]="alertRequest.targetPrice" 
+              name="targetPrice"
+              required
+              min="0.01"
+              step="0.01"
+              [placeholder]="'Enter target price (current: ' + (stock?.sharePrice || 0) + ')'"
+              #targetPriceInput>
+            <div class="form-text">
+              <span *ngIf="alertRequest.alertType === 'PriceAbove' && stock" 
+                    [class]="(stock.sharePrice ?? 0) < alertRequest.targetPrice ? 'text-success' : 'text-warning'">
+                Current: {{ formatCurrency(stock?.sharePrice|| 0) }} 
+                <i class="bi" [class]="(stock.sharePrice ?? 0) < alertRequest.targetPrice ? 'bi-arrow-up-circle-fill' : 'bi-arrow-down-circle-fill'"></i>
+              </span>
+              <span *ngIf="alertRequest.alertType === 'PriceBelow' && stock"
+                    [class]="(stock.sharePrice ?? 0) > (alertRequest.targetPrice ?? 0) ? 'text-success' : 'text-warning'">
+                Current: {{ formatCurrency(stock.sharePrice ?? 0) }}
+                <i class="bi" [class]="(stock.sharePrice ?? 0) > (alertRequest.targetPrice ?? 0) ? 'bi-arrow-down-circle-fill' : 'bi-arrow-up-circle-fill'"></i>
+              </span>
+            </div>
+          </div>
+
+      
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeAlertModal()">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-warning"
+            [disabled]="alertLoading || !alertForm.form.valid">
+            <span *ngIf="alertLoading" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!alertLoading" class="bi bi-bell-fill me-2"></i>
+            Set Alert
+          </button>
+        </div>
+        </div>
+      </form>
+    </div>
+    </div>
+  </div>
+

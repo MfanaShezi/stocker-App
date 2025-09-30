@@ -53,11 +53,6 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
     public async Task<ActionResult> AddToWatchlist(int stockId)
     {
 
-        // if (!User.Identity?.IsAuthenticated ?? true)
-        // {
-        //     return Unauthorized("User is not authenticated");
-        // }
-
         var userId = HttpContext.User.GetUserId();
         var result = await stockRepository.AddToWatchlist(stockId, userId);
 
@@ -126,12 +121,12 @@ public class StockController(IStockRepository stockRepository) : BaseApiControll
     }
 
 
-    [HttpPost]
+    [HttpPost("createalert")]
     public async Task<ActionResult<AlertDto>> CreateAlert(CreateAlertDto alertDto)
     {
         var userId = User.GetUserId();
         var alert = await stockRepository.CreateAlertAsync(alertDto, userId);
-        return CreatedAtAction(nameof(GetAlert), new { id = alert.Id }, alert);
+        return Ok(alert);
     }
 
     [HttpPut("{id}")]

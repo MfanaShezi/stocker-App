@@ -229,11 +229,21 @@ addToWatchlist(stock: stock) {
   console.log('Adding to watchlist:', stock.symbol);
 }
 removeFromWatchlist(stock: stock) {
+  this.stockservice.removeFromWatchlist(stock.id!).subscribe({
+    next: (response) => {
+      console.log('Successfully removed from watchlist:', stock.symbol);
+      this.watchlistStocks.delete(stock.id!);
+      this.isUpdatingWatchlist = false;
+      this.toastr.success(`${stock.symbol} removed from watchlist`);
+    },
+    error: (error) => {
+      console.error('Error removing from watchlist:', error);
+      this.isUpdatingWatchlist = false;
+      this.toastr.error('Failed to remove from watchlist');
+    }
+  })
   this.isUpdatingWatchlist = true;
   console.log('Removing from watchlist:', stock.symbol);
-}
-isInWatchlist(stockId: number): boolean {
-  return this.watchlistStocks.has(stockId);
 }
 //modal 
 showBuyModal = false;

@@ -18,6 +18,9 @@ import 'highcharts/modules/solid-gauge';
 import { BuyStockRequest, PortfolioService } from '../../_services/portfolio.service';
 import { FormsModule } from '@angular/forms';
 import { Purchase } from '../../_models/PortfolioResponse';
+import { Alert, AlertType } from '../../_models/Alert';
+import { AlertService } from '../../_services/alert.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -39,8 +42,106 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
   private stockService = inject(StockService);
   public stockanalysis=inject(StockAnalysisService)
   private platformId = inject(PLATFORM_ID);
-    private portfolioService = inject(PortfolioService);
+  private portfolioService = inject(PortfolioService);
+  private alertService = inject(AlertService);
+   private toastr=inject(ToastrService);
 
+
+    showAlertModal = false;
+    alertRequest: Alert = {
+        id: 0,
+        stockSymbol: '',
+        alertType: AlertType.PriceAbove,
+        targetPrice: 0,
+        isActive: true,
+        createdAt: new Date(),
+        stockId: 0,
+        stockName: ''
+      };
+      alertLoading = false;
+      alertError: string | null = null;
+      alertSuccess = false;
+
+      openAlertModal() {
+        if (!this.stock) return;
+        
+        this.alertRequest = {
+          id: 0, // Provide a default value for the id
+          alertType: AlertType.PriceAbove,
+          targetPrice: this.stock.sharePrice || 0,
+          stockSymbol: this.stock.symbol,
+          isActive: true,
+          createdAt: new Date(),
+          stockId: 0,
+          stockName: ''
+        };
+        this.alertError = null;
+        this.alertSuccess = false;
+        this.showAlertModal = true;
+      }
+    
+      closeAlertModal() {
+        this.showAlertModal = false;
+        this.alertError = null;
+        this.alertSuccess = false;
+        this.alertLoading = false;
+      }
+    
+      createAlert() {
+        if (!this.stock) return;
+    
+        // Validate target price
+        if (this.alertRequest.targetPrice <= 0) {
+          this.alertError = 'Target price must be greater than 0';
+          return;
+        }
+    
+        this.alertLoading = true;
+        this.alertError = null;
+        this.alertSuccess = false;
+    
+        const alertData = {
+          stockId: this.stock.id!, // Ensure stockId is not undefined
+          stockSymbol: this.stock.symbol,
+          alertType: this.alertRequest.alertType,
+          targetPrice: this.alertRequest.targetPrice,
+          isActive: this.alertRequest.isActive
+        };
+    
+        this.alertService.createAlert(alertData).subscribe({
+          next: (response) => {
+            this.alertLoading = false;
+            this.alertSuccess = true;
+            
+            // Close modal after 2 seconds
+            setTimeout(() => {
+              this.closeAlertModal();
+            }, 2000);
+          },
+          error: (err) => {
+            this.alertLoading = false;
+            this.alertError = err.error?.message || err.error || 'Failed to create alert. Please try again.';
+            this.toastr.error('Alert creation error:', err);
+          }
+        });
+      }
+
+      // async toggleWatchlist() {
+      //   if (!this.stock) return;
+    
+      //   try {
+      //     if (this.canAdd()) {
+      //       // Add to watchlist
+      //       await this.stockService.addToWatchlist(this.stock.symbol).toPromise();
+      //     } else {
+      //       // Remove from watchlist
+      //       await this.stockService.removeFromWatchlistBySymbol(this.stock.symbol).toPromise();
+      //     }
+      //   } catch (error) {
+      //     console.error('Watchlist toggle error:', error);
+      //   }
+      // }
+    
   ngOnInit(): void {
     
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -67,6 +168,7 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
       setTimeout(() => this.loadTradingViewChart(), 100);
     }
   }
+
 
   //Sentiment Analysis
   loadSentiment() {

@@ -36,19 +36,22 @@ cachedAlerts=new Map();
   }
 
   createAlert(alert: CreateAlert): Observable<Alert> {
-    return this.http.post<Alert>(this.baseUrl, alert);
+    return this.http.post<Alert>(`${this.baseUrl}stock/createalert`, alert);
   }
 
-  updateAlert(id: number, alert: CreateAlert): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${id}`, alert);
+  // updateAlert(id: number, alert: CreateAlert): Observable<void> {
+  //   return this.http.put<void>(`${this.baseUrl}/${id}`, alert);
+  // }
+  updateAlert(alertId: number, alertData: Partial<Alert>): Observable<Alert> {
+    return this.http.put<Alert>(`${this.baseUrl}stock/${alertId}`, alertData);
   }
 
   deleteAlert(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}stock/${id}`);
   }
 
   toggleAlert(id: number): Observable<void> {
-    return this.http.patch<void>(`${this.baseUrl}/${id}/toggle`, {});
+    return this.http.patch<void>(`${this.baseUrl}stock/${id}/toggle`, {});
   }
 }
 

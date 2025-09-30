@@ -5,12 +5,13 @@ import { ToastrService } from 'ngx-toastr';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-alert',
   standalone: true,
-  imports: [DatePipe,CurrencyPipe,CommonModule],
+  imports: [DatePipe,CurrencyPipe,CommonModule,FormsModule],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.css'
 })
@@ -26,6 +27,29 @@ export class AlertComponent implements OnInit {
   ngOnInit(): void {
     this.loadAlerts();
     
+  }
+  // Edit form properties
+  showEditForm = false;
+  editAlert: Alert = {
+    id: 0,
+    stockSymbol: '',
+    alertType: AlertType.PriceAbove,
+    targetPrice: 0,
+    isActive: true,
+    createdAt: new Date(),
+    stockId: 0,
+    stockName: ''
+  };
+  editLoading = false;
+  editError: string | null = null;
+  editSuccess = false;
+
+  //Open edit form
+  openEditForm(alert: Alert) {
+    this.editAlert = { ...alert }; // Copy alert data
+    this.editError = null;
+    this.editSuccess = false;
+    this.showEditForm = true;
   }
 
   loadAlerts(): void {
@@ -47,7 +71,7 @@ export class AlertComponent implements OnInit {
     this.alertService.toggleAlert(alert.id).subscribe({
       next: () => {
         alert.isActive = !alert.isActive;
-        this.toastr.success(`Alert ${alert.isActive ? 'enabled' : 'disabled'}`);
+        this.toastr.success(`Alert ${alert.isActive ? 'activated' : 'deactivated'} successfully`);
       },
       error: () => {
         this.toastr.error('Failed to toggle alert');
@@ -77,5 +101,43 @@ export class AlertComponent implements OnInit {
     this.showCreateForm = false;
     this.loadAlerts();
   }
+  closeEditForm(): void {
+
+    this.showEditForm = false;
   
+  }
+
+  updateAlert() {
+    if (!this.editAlert.id) return;
+
+    this.editLoading = true;
+    this.editError = null;
+    this.editSuccess = false;
+
+    this.alertService.updateAlert(this.editAlert.id, this.editAlert).subscribe({
+      next: (updatedAlert) => {
+        this.editLoading = false;
+        this.editSuccess = true;
+        
+        // Update the alert in the local array
+        const index = this.alerts.findIndex(a => a.id === updatedAlert.id);
+        if (index !== -1) {
+          this.alerts[index] = updatedAlert;
+        }
+
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          this.closeEditForm();
+        }, 2000);
+      },
+      error: (err) => {
+        this.editLoading = false;
+        this.editError = err.error?.message || err.error || 'Failed to update alert. Please try again.';
+        console.error('Update alert error:', err);
+      }
+    });
+  }
+
+ 
+
 }

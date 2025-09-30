@@ -192,13 +192,15 @@ public class StockRepository(DataContext context, IMapper mapper) : IStockReposi
             UserId = userId,
             StockId = alertDto.StockId,
             TargetPrice = alertDto.TargetPrice,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
             AlertType = Enum.Parse<AlertType>(alertDto.AlertType!)
         };
 
         context.Alerts.Add(alert);
         await context.SaveChangesAsync();
 
-        return await GetAlertByIdAsync(alert.Id, userId);
+        return await GetAlertByIdAsync(alert.Id, userId)!;
     }
 
     public async Task<bool> UpdateAlertAsync(int alertId, CreateAlertDto alertDto, int userId)
@@ -209,9 +211,10 @@ public class StockRepository(DataContext context, IMapper mapper) : IStockReposi
         if (alert == null) return false;
 
         alert.TargetPrice = alertDto.TargetPrice;
-        alert.AlertType = Enum.Parse<AlertType>(alertDto.AlertType);
+        alert.AlertType = Enum.Parse<AlertType>(alertDto.AlertType!);
 
-        return await context.SaveChangesAsync() > 0;
+    await context.SaveChangesAsync();
+    return true;
     }
 
     public async Task<bool> DeleteAlertAsync(int alertId, int userId)

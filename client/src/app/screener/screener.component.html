@@ -269,7 +269,7 @@
                     <i class="fas fa-eye"></i>
                   </button>
                   <button [ngClass]="canRemove(stock) ? 'btn btn-success active' : 'btn btn-outline-success '"
-                         [disabled]="canRemove(stock)"
+                         
                          (click)="addToWatchlist(stock.symbol)"
                          title="Add to Watchlist">
                     <i class="fas fa-star"></i>

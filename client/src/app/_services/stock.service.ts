@@ -71,7 +71,29 @@ AddToWatchlist(id: number): Observable<any> {
     })
   );
   }
+// Remove from watchlist method
+removeFromWatchlist(stockId: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}stock/${stockId}/watchlist`).pipe(
+    tap(() => {
+      // Update the watchlist signal by removing the stock
+      const currentWatchlist = this.watchliststocks();
+      const updatedWatchlist = currentWatchlist ? currentWatchlist.filter(stock => stock.id !== stockId) : [];
+      this.watchliststocks.set(updatedWatchlist);
+    })
+  );
+}
 
+// Alternative: Remove by symbol (if you prefer using symbol instead of ID)
+removeFromWatchlistBySymbol(symbol: string): Observable<any> {
+  return this.http.delete(`${this.baseUrl}stock/${symbol}/watchlist`).pipe(
+    tap(() => {
+      // Update the watchlist signal by removing the stock
+      const currentWatchlist = this.watchliststocks();
+      const updatedWatchlist = currentWatchlist ? currentWatchlist.filter(stock => stock.symbol.toUpperCase() !== symbol.toUpperCase()) : [];
+      this.watchliststocks.set(updatedWatchlist);
+    })
+  );
+}
 getStockById(id: number): Observable<stock | null> {
   return this.http.get<stock>(`${this.baseUrl}stock/${id}`);
 }
@@ -104,22 +126,23 @@ getstockSentiment(symbol: string): Observable<any> {
 
 isInWatchList(symbol: string): boolean {
   // If watchlist hasn't been loaded yet, fetch it
-  if ( !this.watchliststocks() || this.watchliststocks()!.length === 0) {
-    console.log('Watchlist not loaded, fetching...');
-    this.getwatchlist().subscribe({
-      next: () => {
+  // if ( !this.watchliststocks() || this.watchliststocks()!.length === 0) {
+  //   console.log('Watchlist not loaded, fetching...');
+  //   // this.getwatchlist().subscribe({
+  //   //   next: () => {
         
-      },
-      error: (err) => {
-        console.error('Error loading watchlist:', err);
-        //this.watchlistLoaded.set(true); // Mark as loaded even on error to avoid infinite loops
-      }
-    });
-    return false; // Return false while loading
-  }
+  //   //   },
+  //   //   error: (err) => {
+  //   //     console.error('Error loading watchlist:', err);
+  //   //     //this.watchlistLoaded.set(true); // Mark as loaded even on error to avoid infinite loops
+  //   //   }
+  //   // });
+  //   return false; // Return false while loading
+  // }
 
   // Check if symbol is in watchlist
   const watchlist = this.watchliststocks();
+  console.log('Checking if symbol is in watchlist:', symbol, watchlist);
   return watchlist?.some(s => s.symbol.toUpperCase() === symbol.toUpperCase()) ?? false;
 }
 
