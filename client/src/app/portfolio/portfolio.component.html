@@ -18,7 +18,7 @@
     <!-- Error State -->
     <div *ngIf="error" class="error-container">
       <div class="error-message">
-        <i class="error-icon">⚠️</i>
+        <i class="error-icon"></i>
         <p>{{ error }}</p>
         <button class="retry-btn" (click)="loadPortfolio()">Retry</button>
       </div>
@@ -28,7 +28,7 @@
     <div *ngIf="!loading && !error && portfolioSummary" class="portfolio-content">
       
       <!-- Portfolio Summary Card -->
-      <div class="summary-card">
+      <div class="summary-card bg-primary text-white">
         <h3>Portfolio Summary</h3>
         <div class="summary-grid">
           <div class="summary-item">

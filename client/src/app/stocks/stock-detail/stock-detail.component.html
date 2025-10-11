@@ -258,23 +258,37 @@
       </div>
       
       <div *ngIf="!sentimentLoading && sentimentData" class="row">
-        <div class="col-md-8">
-          <div id="sentiment-gauge" style="height: 300px;"></div>
-        </div>
+        <!-- Chart with center label overlay -->
+      <div class="col-md-6">
+        <canvas baseChart
+          [data]="sentimentChartData"
+          [options]="sentimentChartOptions"
+          [type]="'doughnut'">
+        </canvas>
+      </div>
         <div class="col-md-4">
           <div class="sentiment-info">
             <h6>Sentiment Details</h6>
             <div class="mb-2">
               <strong>Status:</strong> 
-              <span [class]="'badge ms-2 ' + getSentimentBadgeClass(sentimentData.sentiment.sentiment)">
-                {{getSentimentIcon(sentimentData.sentiment.sentiment)}} {{sentimentData.sentiment.sentiment}}
+              <span [class]="'badge ms-2 ' + getSentimentBadgeClass(sentimentData.Results.sentiment)">
+                {{getSentimentIcon(sentimentData.Results.sentiment)}} {{sentimentData.Results.sentiment}}
               </span>
             </div>
             <div class="mb-2">
-              <strong>Confidence:</strong> {{(sentimentData.sentiment.confidence * 100).toFixed(1)}}%
+              <strong>Sentiment:</strong> {{(sentimentData.Results.sentiment)}}
             </div>
             <div class="mb-2">
-              <strong>Articles:</strong> {{sentimentData.sentiment.articlesProcessed}}/{{sentimentData.sentiment.totalArticles}}
+              <strong>PositiveArticles:</strong> {{(sentimentData.Results.positiveArticles)}}
+            </div>
+            <div class="mb-2">
+              <strong>NegativeArticles:</strong> {{(sentimentData.Results.negativeArticles)}}
+            </div>
+            <div class="mb-2">
+              <strong>NeutralArticles:</strong> {{(sentimentData.Results.neutralArticles)}}
+            </div>
+            <div class="mb-2">
+              <strong>Articles:</strong> {{sentimentData.Results.articlesProcessed}}/{{sentimentData.Results.totalArticles}}
             </div>
             <div class="mb-2">
               <strong>Updated:</strong> {{sentimentData.timestamp | date:'short'}}
@@ -352,9 +366,10 @@
                   <p class="card-text text-muted mb-2">
                     <small>Published: {{news.publishedDate| date:'medium'}}</small>
                   </p>
-                  <a 
-                    [href]="news.url" 
+                  <a
+                    [href]="news.link"
                     target="_blank" 
+                    rel="noopener noreferrer"
                     class="btn btn-outline-primary btn-sm">
                     <i class="fas fa-external-link-alt me-1"></i>
                     Read Full Article

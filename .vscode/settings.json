@@ -16,11 +16,17 @@
     "getwatchlist",
     "highcharts",
     "huburl",
+    "logoutbtn",
+    "logoutlink",
     "mapholdingtostock",
     "Marketaux",
+    "nphf",
+    "OPFI",
+    "OPRA",
     "PKJXXKY",
     "Portfoliio",
     "Portfoliovalue",
+    "qfbk",
     "registerables",
     "shareprice",
     "Sindy",
@@ -28,8 +34,10 @@
     "stockservice",
     "toastr",
     "userdetails",
+    "utxd",
     "Watchlist",
     "watchlists",
-    "watchliststocks"
+    "watchliststocks",
+    "xarf"
   ]
 }

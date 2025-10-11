@@ -54,9 +54,6 @@ export interface StockNews {
      source : string | null;
      publishedDate : string;
     title : string;
-    url:string; 
-   
-
-
+    link:string; 
 
 }

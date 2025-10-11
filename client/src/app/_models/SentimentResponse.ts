@@ -1,10 +1,10 @@
 export interface SentimentResponse {
     ticker: string;
-    sentiment: {
+    Results: {
       sentiment: string;
-      score: number;
-      rawScore: number;
-      confidence: number;
+      positiveArticles: number;
+      negativeArticles: number;
+      neutralArticles: number;
       articlesProcessed: number;
       totalArticles: number;
     };

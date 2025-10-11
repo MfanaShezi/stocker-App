@@ -11,28 +11,37 @@
     </button>
 
     <!-- Center Content -->
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      <div class="mx-auto d-flex flex-column flex-lg-row align-items-center">
-        <form class="search-container m-2" (submit)="onSearch()">
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            name="searchTerm"
-            placeholder="Search for stocks, ETFs or tickers"
-          />
-          <button type="submit"><i class="fa fa-search"></i></button>
-        </form>
+   
 
-        <ul class="nav-links">
-          <li><a routerLink="/dashboard">Watchlist</a></li>
-          <li><a routerLink="/portfolio">Portfolio</a></li>
-          <li><a routerLink="/stocks">Stocks</a></li>
-          <!-- <li><a (click)="getetfs()">ETFs</a></li> -->
-          <!-- <li><a routerLink="/suggested">Suggested</a></li> -->
-          <li><a routerLink="/news">News</a></li>
-          <li><a routerLink="/forum">Forum</a></li>
-        </ul>
-      </div>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        @if(accountService.currentUser())
+        {
+          <div class="mx-auto d-flex flex-column flex-lg-row align-items-center">
+            <form class="search-container m-2" (submit)="onSearch()">
+              <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                name="searchTerm"
+                placeholder="Search for stocks, ETFs or tickers"
+              />
+              <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+
+          
+                <ul class="nav-links">
+                  <li><a routerLink="/dashboard">Watchlist</a></li>
+                  <li><a routerLink="/portfolio">Portfolio</a></li>
+                  <li><a routerLink="/stocks">Stocks</a></li>
+                  <!-- <li><a (click)="getetfs()">ETFs</a></li> -->
+                  <!-- <li><a routerLink="/suggested">Suggested</a></li> -->
+                  <li><a routerLink="/news">News</a></li>
+                  <li><a routerLink="/forum">Forum</a></li>
+                </ul>
+      
+          </div>
+        }
+    
+       
 
       <!-- Welcome/Login - Far Right -->
       @if(accountService.currentUser()){
@@ -43,26 +52,47 @@
             {{accountService.currentUser()?.username}}
           </a>
           <ul class="dropdown-menu dropdown-menu-end logoutbtn" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item shadow-sm loglink" (click)="logout()">Logout</a></li>
+            <li><a class="dropdown-item shadow-sm logoutlink " (click)="logout()">Logout</a></li>
           </ul>
         </div>
       }
 
-      @if(!accountService.currentUser()){
-        <form #loginForm="ngForm" (ngSubmit)="login()" class="d-flex ms-auto">
+      <!-- @if(!accountService.currentUser()){
+        <form #loginForm="ngForm" (ngSubmit)="login()" class="d-flex ms-auto  ">
           <input name="Username" 
                  [(ngModel)]="model.Username" 
-                 class="form-control me-2" 
+                 class="form-control me-2 " 
                  placeholder="Username">
           <input name="password"
                  [(ngModel)]="model.Password"
-                 class="form-control me-2" 
+                 class="form-control me-2 " 
                  placeholder="Password" 
                  type="password">
-          <button class="btn btn-success me-2" type="submit">Login</button>
+          <button class="btn btn-success me-2 px-3 btn-size"  type="submit">Login</button>
         </form>
-        <button class="btn btn-primary" routerLink="/register">Register</button>
+        <button class="btn btn-primary mb-3 btn-size"  routerLink="/register" type="button">Register</button>
+      } -->
+
+      @if(!accountService.currentUser()){
+        <div class="d-flex flex-column flex-md-row ms-auto align-items-center">
+          <form #loginForm="ngForm" (ngSubmit)="login()" class="d-flex flex-column flex-md-row mb-2 mb-md-0">
+            <input name="Username" 
+                   [(ngModel)]="model.Username" 
+                   class="form-control mb-2 mb-md-0 me-md-2" 
+                   placeholder="Username">
+            <input name="password"
+                   [(ngModel)]="model.Password"
+                   class="form-control mb-2 mb-md-0 me-md-2" 
+                   placeholder="Password" 
+                   type="password">
+            <button class="btn btn-success equal-btn mb-2 mb-md-0 me-md-2" type="submit">Login</button>
+            <button class="btn btn-primary equal-btn mb-3" routerLink="/register" type="button">Register</button>
+          </form>
+         
+        </div>
       }
     </div>
+  
   </div>
+
 </nav>

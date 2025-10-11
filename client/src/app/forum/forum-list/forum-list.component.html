@@ -129,7 +129,8 @@
           <div class="thread-header">
             <h3 class="thread-title">{{ thread.title }}</h3>
             <div class="thread-meta">
-              <span class="creator">by {{ thread.creatorUsername }}</span>
+              
+              <span class="creator"><i class="fa fa-user"></i> by {{ thread.creatorUsername }}</span>
               <span class="created-date">{{ formatDate(thread.createdAt) }}</span>
             </div>
           </div>
@@ -140,11 +141,11 @@
   
           <div class="thread-stats">
             <div class="stat-item">
-              <i class="bi bi-chat-left-text"></i>
+              <i class="fa fa-comments"></i>
               <span>{{ thread.messageCount }} {{ thread.messageCount === 1 ? 'reply' : 'replies' }}</span>
             </div>
             <div class="stat-item last-activity">
-              <i class="bi bi-clock"></i>
+              <i class="fas fa-clock "></i>
               <span>Last activity {{ formatTime(thread.lastMessageAt) }}</span>
             </div>
           </div>

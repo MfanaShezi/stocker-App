@@ -12,21 +12,23 @@ import { stock } from '../../_models/stock';
 import { StockService } from '../../_services/stock.service';
 import { StockAnalysisService } from '../../_services/stock-analysis.service';
 import { SentimentResponse } from '../../_models/SentimentResponse';
-import Highcharts from 'highcharts';
-import 'highcharts/highcharts-more';
-import 'highcharts/modules/solid-gauge';
+// import Highcharts from 'highcharts';
+// import 'highcharts/highcharts-more';
+// import 'highcharts/modules/solid-gauge';
 import { BuyStockRequest, PortfolioService } from '../../_services/portfolio.service';
 import { FormsModule } from '@angular/forms';
 import { Purchase } from '../../_models/PortfolioResponse';
 import { Alert, AlertType } from '../../_models/Alert';
 import { AlertService } from '../../_services/alert.service';
 import { ToastrService } from 'ngx-toastr';
+import { ChartConfiguration, ChartType } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
 
 
 @Component({
   selector: 'app-stock-detail',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,BaseChartDirective],
   templateUrl: './stock-detail.component.html',
   styleUrls: ['./stock-detail.component.css']
 })
@@ -175,101 +177,24 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
     
     if (!this.stock?.symbol) return;
 
-    //console.log('Loading sentiment data.. for symbol:', this.stock.symbol, '.');
+    console.log('Loading sentiment data.. for symbol:', this.stock.symbol, '.');
 
-    // this.sentimentLoading = true;
-    // this.stockService.getstockSentiment(this.stock.symbol).subscribe({
-    //   next: (response) => {
-    //     this.sentimentData = response;
-    //     console.log('Sentiment data loaded:', this.sentimentData);
-    //     this.sentimentLoading = false;
-    //     this.createSentimentGauge();
-    //   },
-    //   error: (error) => {
-    //     console.error('Error loading sentiment:', error);
-    //     this.sentimentLoading = false;
-    //   }
-    //});
-  }
-  createSentimentGauge() {
-    console.log('createSentimentGauge called');
-    console.log('sentimentData:', this.sentimentData);
-    
-    if (!this.sentimentData) {
-      console.log('No sentiment data available');
-      return;
-    }
-  
-    setTimeout(() => {
-      const container = document.getElementById('sentiment-gauge');
-      console.log('Container element:', container);
-      
-      if (!container) {
-        console.log('Container not found!');
-        return;
+    this.sentimentLoading = true;
+    this.stockService.getstockSentiment(this.stock.symbol).subscribe({
+      next: (response) => {
+        this.sentimentData = response;
+        this.updateSentimentChart();
+        console.log('Sentiment data loaded:', this.sentimentData);
+        this.sentimentLoading = false;
+        //this.createSentimentGauge();
+      },
+      error: (error) => {
+        console.error('Error loading sentiment:', error);
+        this.sentimentLoading = false;
       }
-  
-      const score = this.sentimentData!.sentiment.score;
-      const sentiment = this.sentimentData!.sentiment.sentiment;
-      const normalizedScore =(score/1)*100;
-      
-      console.log('Score:', score);
-      console.log('Sentiment:', sentiment);
-      console.log('Normalized score:', normalizedScore);
-  
-      const gaugeOptions: Highcharts.Options = {
-        chart: {
-          type: 'solidgauge',
-          height: 300,
-          backgroundColor: 'transparent'
-        },
-        title: {
-          text: `${this.stock?.symbol} Sentiment`
-        },
-        pane: {
-          center: ['50%', '75%'],
-          size: '120%',
-          startAngle: -90,
-          endAngle: 90,
-          background: [{
-            backgroundColor: '#EEE',
-            innerRadius: '60%',
-            outerRadius: '100%',
-            shape: 'arc'
-          }]
-        },
-        yAxis: {
-          min: 0,
-          max: 100,
-          stops: [
-            [0.33, '#FF4444'],
-            [0.66, '#FFA500'],
-            [1, '#44AA44']
-          ],
-          lineWidth: 0,
-          tickWidth: 0
-        },
-        series: [{
-          type: 'solidgauge',
-          name: 'Sentiment',
-          data: [normalizedScore]
-        } as Highcharts.SeriesSolidgaugeOptions],
-        credits: {
-          enabled: false
-        }
-      };
-  
-      console.log('About to create chart with options:', gaugeOptions);
-  
-      try {
-        const chart = Highcharts.chart('sentiment-gauge', gaugeOptions);
-        console.log('Chart created successfully:', chart);
-      } catch (error) {
-        console.error('Error creating chart:', error);
-      }
-    }, 500);
+    });
   }
-  getSentimentBadgeClass(sentiment: string): string {
+    getSentimentBadgeClass(sentiment: string): string {
     switch (sentiment.toLowerCase()) {
       case 'positive': return 'bg-success';
       case 'negative': return 'bg-danger';
@@ -495,6 +420,84 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
     return this.stock !== null && !this.buyLoading && !this.stockService.isInWatchList(this.stock.symbol);
   }
 
+  // donut chart
+
+  sentimentChartData: any = {
+    labels: ['Positive', 'Negative', 'Neutral'],
+    datasets: [
+      {
+        data: [0, 0,0],
+        backgroundColor: ['#10b981','#ef4444', '#334155'], // Green ,red & dark gray
+        borderWidth: 0,
+        hoverOffset: 4
+      }
+    ]
+  };
+
+  public sentimentChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    // cutout: '70%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+          //color: '#f1f5f9', // Light text for dark theme
+          font: {
+            family: "'Inter', sans-serif",
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#1e293b',
+       // titleColor: '#f1f5f9',
+        //bodyColor: '#f1f5f9',
+        displayColors: false,
+        padding: 12
+      }
+    },
+    animation: {
+      duration: 1000, // Example of a valid property
+      easing: 'easeInOutQuad' // Replace with a valid property
+    }
+  };
+
+    public sentimentChartType: ChartType = 'doughnut';
+
+    updateSentimentChart() {
+      if (!this.sentimentData?.Results) return;
+      
+      // Get sentiment data
+      const positive = this.sentimentData.Results.positiveArticles || 0;
+      const negative = this.sentimentData.Results.negativeArticles || 0;
+      const neutral = this.sentimentData.Results.neutralArticles || 0;
+      
+      // Update chart data
+      this.sentimentChartData = {
+        labels: ['Positive', 'Negative', 'Neutral'],
+        datasets: [
+          {
+            data: [positive, negative, neutral],
+            backgroundColor: ['#10b981', '#ef4444', '#f59e0b'], // Green, red & amber
+            borderWidth: 0,
+            hoverOffset: 4
+          }
+        ]
+      };
+    }
+
+  // Helper methods for sentiment display
+getSentimentScore(sentiment: string): number {
+  switch (sentiment.toLowerCase()) {
+    case 'positive': return 80;
+    case 'neutral': return 50;
+    case 'negative': return 20;
+    default: return 50;
+  }
+}
 
 
 }

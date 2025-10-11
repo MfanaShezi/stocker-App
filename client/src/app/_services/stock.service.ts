@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment.development';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { SentimentResponse } from '../_models/SentimentResponse';
+import { News } from '../_models/news';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ stocks=signal<stock[] | null >(null);
 watchliststocks=signal<stock[] | null >(null);
 cachedstocks=new Map();
 cachedwatchliststocks=new Map();
+
 
 
 
@@ -110,6 +112,10 @@ clearWatchlistCache() {
   console.log("Watchlist cache cleared");
 }
 
+getGeneralNews(): Observable<News> {
+  return this.http.get<any>(`${this.baseUrl}stock/news`);
+}
+
 getstockSentiment(symbol: string): Observable<any> {
   console.log(`Fetching sentiment for symbol: ${symbol}`);
   return this.http.get<SentimentResponse>(`https://sentiment-analyser-01hx.onrender.com/api/analyse/${symbol}`);
@@ -142,8 +148,9 @@ isInWatchList(symbol: string): boolean {
 
   // Check if symbol is in watchlist
   const watchlist = this.watchliststocks();
-  console.log('Checking if symbol is in watchlist:', symbol, watchlist);
+ // console.log('Checking if symbol is in watchlist:', symbol, watchlist);
   return watchlist?.some(s => s.symbol.toUpperCase() === symbol.toUpperCase()) ?? false;
 }
+
 
 }

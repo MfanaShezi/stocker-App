@@ -1,6 +1,7 @@
 using API.Data;
 using API.Entities;
 using API.Extensions;
+using API.HelperEntities;
 using API.Helpers;
 using API.Interfaces;
 using API.MIddleware;
@@ -26,13 +27,15 @@ builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 builder.Services.AddSignalR();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddIdentityServices(builder.Configuration);
-
-builder.Services.Configure<AlpacaSettings>(
-    builder.Configuration.GetSection("AlpacaSettings"));
+builder.Services.Configure<AlpacaSettings>(builder.Configuration.GetSection("AlpacaSettings")); ;
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 
 // Register the Seed class as a service
 builder.Services.AddTransient<Seed>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddHostedService<EmailBackgroundService>();
 
 var app = builder.Build();
 

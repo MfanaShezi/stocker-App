@@ -52,7 +52,7 @@ public class StockNewsDto
     public string? Content { get; set; }
     public string? Source { get; set; }
     public DateTime PublishedDate { get; set; }
-    public string? Url { get; set; }
+    public string? Link { get; set; }
 }
 
 public class StockDividendDto

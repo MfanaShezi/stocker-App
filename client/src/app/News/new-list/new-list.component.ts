@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { StockService } from '../../_services/stock.service';
+import { News } from '../../_models/news';
 
 interface NewsItem {
   id: number;
@@ -22,53 +24,57 @@ interface NewsItem {
   styleUrls: ['./new-list.component.css']
 })
 export class NewListComponent implements OnInit {
-  newsList: NewsItem[] = [];
+  newsList: News[] = [];
   hasMoreNews = true;
   isLoading = false;
+  stockservice = inject(StockService);
+  error: string | null = null;
+  loading = false;
 
   ngOnInit(): void {
-    this.loadSampleData();
+    //this.loadSampleData();
+    this.LoadNews();
   }
 
-  loadSampleData(): void {
-    this.newsList = [
-      {
-        id: 1,
-        title: "Federal Reserve Signals Potential Rate Cut Amid Economic Uncertainty",
-        summary: "The Federal Reserve hints at possible interest rate reductions following mixed economic indicators and persistent inflation concerns. Market analysts predict significant impact on tech stocks and banking sector.",
-        description: "Federal Reserve officials are considering a strategic shift in monetary policy as economic data presents a complex picture of recovery and persistent challenges.",
-        imageUrl: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=400&fit=crop",
-        source: "Reuters",
-        publishedAt: new Date('2024-01-15T10:30:00'),
-        category: "Federal Reserve",
-        isBookmarked: false
-      },
-      {
-        id: 2,
-        title: "Tesla Stock Surges 12% on Q4 Delivery Numbers Beat",
-        summary: "Tesla exceeded analyst expectations with record quarterly deliveries, pushing the stock to its highest level in six months. Strong performance in China and Europe markets drives growth.",
-        description: "Tesla's fourth-quarter delivery numbers have exceeded Wall Street expectations, leading to a significant surge in after-hours trading.",
-        imageUrl: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=400&fit=crop",
-        source: "Bloomberg",
-        publishedAt: new Date('2024-01-15T08:45:00'),
-        category: "Earnings",
-        isBookmarked: true
-      },
-      {
-        id: 3,
-        title: "Cryptocurrency Market Sees Major Recovery as Bitcoin Breaks $45K",
-        summary: "Bitcoin and major altcoins rally following institutional adoption news and regulatory clarity from major economies. Ethereum also gains 8% in 24-hour trading.",
-        description: "The cryptocurrency market is experiencing a significant recovery phase with Bitcoin leading the charge above the $45,000 resistance level.",
-        imageUrl: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&h=400&fit=crop",
-        source: "CoinDesk",
-        publishedAt: new Date('2024-01-15T07:15:00'),
-        category: "Crypto",
-        isBookmarked: false
-      }
-    ];
-  }
+  // loadSampleData(): void {
+  //   this.newsList = [
+  //     {
+  //       id: 1,
+  //       title: "Federal Reserve Signals Potential Rate Cut Amid Economic Uncertainty",
+  //       summary: "The Federal Reserve hints at possible interest rate reductions following mixed economic indicators and persistent inflation concerns. Market analysts predict significant impact on tech stocks and banking sector.",
+  //       description: "Federal Reserve officials are considering a strategic shift in monetary policy as economic data presents a complex picture of recovery and persistent challenges.",
+  //       imageUrl: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=400&fit=crop",
+  //       source: "Reuters",
+  //       publishedAt: new Date('2024-01-15T10:30:00'),
+  //       category: "Federal Reserve",
+  //       isBookmarked: false
+  //     },
+  //     {
+  //       id: 2,
+  //       title: "Tesla Stock Surges 12% on Q4 Delivery Numbers Beat",
+  //       summary: "Tesla exceeded analyst expectations with record quarterly deliveries, pushing the stock to its highest level in six months. Strong performance in China and Europe markets drives growth.",
+  //       description: "Tesla's fourth-quarter delivery numbers have exceeded Wall Street expectations, leading to a significant surge in after-hours trading.",
+  //       imageUrl: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=400&fit=crop",
+  //       source: "Bloomberg",
+  //       publishedAt: new Date('2024-01-15T08:45:00'),
+  //       category: "Earnings",
+  //       isBookmarked: true
+  //     },
+  //     {
+  //       id: 3,
+  //       title: "Cryptocurrency Market Sees Major Recovery as Bitcoin Breaks $45K",
+  //       summary: "Bitcoin and major altcoins rally following institutional adoption news and regulatory clarity from major economies. Ethereum also gains 8% in 24-hour trading.",
+  //       description: "The cryptocurrency market is experiencing a significant recovery phase with Bitcoin leading the charge above the $45,000 resistance level.",
+  //       imageUrl: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&h=400&fit=crop",
+  //       source: "CoinDesk",
+  //       publishedAt: new Date('2024-01-15T07:15:00'),
+  //       category: "Crypto",
+  //       isBookmarked: false
+  //     }
+  //   ];
+  // }
 
-  openNewsDetail(news: NewsItem): void {
+  openNewsDetail(news: News): void {
     console.log('Opening news detail for:', news.title);
     // Navigate to news detail page or open modal
   }
@@ -95,39 +101,76 @@ export class NewListComponent implements OnInit {
     }
   }
 
-  loadMoreNews(): void {
-    this.isLoading = true;
+  // loadMoreNews(): void {
+  //   this.isLoading = true;
     
-    // Simulate API call
-    setTimeout(() => {
-      const moreNews: NewsItem[] = [
-        {
-          id: 4,
-          title: "Apple Reports Record Services Revenue Despite iPhone Sales Decline",
-          summary: "Apple's services division continues to show strong growth while hardware sales face headwinds in key markets.",
-          imageUrl: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=400&fit=crop",
-          source: "CNBC",
-          publishedAt: new Date('2024-01-14T16:20:00'),
-          category: "Earnings",
-          isBookmarked: false
-        },
-        {
-          id: 5,
-          title: "Oil Prices Climb on Middle East Tensions and Supply Concerns",
-          summary: "Crude oil futures rise as geopolitical tensions escalate and OPEC+ maintains production cuts.",
-          imageUrl: "https://images.unsplash.com/photo-1566228015668-4c45dbc4e2f5?w=800&h=400&fit=crop",
-          source: "Wall Street Journal",
-          publishedAt: new Date('2024-01-14T14:10:00'),
-          category: "Commodities",
-          isBookmarked: false
-        }
-      ];
+  //   // Simulate API call
+  //   setTimeout(() => {
+  //     const moreNews: NewsItem[] = [
+  //       {
+  //         id: 4,
+  //         title: "Apple Reports Record Services Revenue Despite iPhone Sales Decline",
+  //         summary: "Apple's services division continues to show strong growth while hardware sales face headwinds in key markets.",
+  //         imageUrl: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=400&fit=crop",
+  //         source: "CNBC",
+  //         publishedAt: new Date('2024-01-14T16:20:00'),
+  //         category: "Earnings",
+  //         isBookmarked: false
+  //       },
+  //       {
+  //         id: 5,
+  //         title: "Oil Prices Climb on Middle East Tensions and Supply Concerns",
+  //         summary: "Crude oil futures rise as geopolitical tensions escalate and OPEC+ maintains production cuts.",
+  //         imageUrl: "https://images.unsplash.com/photo-1566228015668-4c45dbc4e2f5?w=800&h=400&fit=crop",
+  //         source: "Wall Street Journal",
+  //         publishedAt: new Date('2024-01-14T14:10:00'),
+  //         category: "Commodities",
+  //         isBookmarked: false
+  //       }
+  //     ];
 
-      this.newsList = [...this.newsList, ...moreNews];
-      this.isLoading = false;
+  //     this.newsList = [...this.newsList, ...moreNews];
+  //     this.isLoading = false;
       
-      // Simulate no more news after this load
-      this.hasMoreNews = false;
-    }, 1500);
+  //     // Simulate no more news after this load
+  //     this.hasMoreNews = false;
+  //   }, 1500);
+  // }
+
+  LoadNews() {
+    this.loading = true;
+    this.error = null;
+    
+    this.stockservice.getGeneralNews().subscribe({
+      next: (response: any) => {
+        console.log('Response is an array:', response);
+        // Handle different API response formats
+        if (Array.isArray(response)) {
+   
+          // If response is already an array, use it directly
+          this.newsList = response;
+        } else if (response && typeof response === 'object') {
+          // If response is a single object or has a nested structure
+          // Check if it has articles property (common in news APIs)
+          if (response.articles && Array.isArray(response.articles)) {
+            this.newsList = response.articles;
+          } else if (response.data && Array.isArray(response.data)) {
+            this.newsList = response.data;
+          } else {
+            // If it's a single news item
+            this.newsList = [response];
+          }
+        } else {
+          this.newsList = [];
+          this.error = "Invalid response format";
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load news:', err);
+        this.error = "Failed to load news. Please try again.";
+        this.loading = false;
+      }
+    });
   }
 }

@@ -28,6 +28,7 @@ export const routes: Routes =
             {path: 'news',component:NewListComponent},
             {path: 'screener',component:ScreenerComponent},
             {path :'dashboard',component:DashboardComponent},
+            
             {path: "profile",component:UserDetailsComponent},
             {path: 'alerts', component:AlertComponent },
             {path:'portfolio',component:PortfolioComponent}

@@ -96,7 +96,9 @@
   
   /* Summary Card */
   .summary-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3a5ac1 0%, #4e3178 100%);
+    /* background: linear-gradient(135deg, #2c4ca9 0%, #3b2970 100%); */
+    /* background: linear-gradient(135deg, #4a67cc 0%, #5d3b85 100%); */
     color: white;
     padding: 30px;
     border-radius: 12px;
@@ -533,3 +535,5 @@ modal {
 .modal.show {
   display: block !important;
 }
+
+
