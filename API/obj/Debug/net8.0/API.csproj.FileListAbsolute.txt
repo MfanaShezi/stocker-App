@@ -206,3 +206,6 @@ c:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\MailKit.dll
 c:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\MimeKit.dll
 c:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
 c:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+c:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\MessagePack.dll
+c:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\MessagePack.Annotations.dll
+c:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.NET.StringTools.dll

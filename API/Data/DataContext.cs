@@ -69,7 +69,7 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
         modelBuilder.Entity<Stock>()
             .Property(s => s.Name)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(255);
 
         modelBuilder.Entity<Stock>()
         .Property(s => s.Sentiment)
@@ -163,18 +163,123 @@ public class DataContext(DbContextOptions<DataContext> options) : IdentityDbCont
             .HasPrecision(18, 2);
 
         //Purchases
-         modelBuilder.Entity<Purchase>(entity =>
-        {
-            entity.HasOne(p => p.User)
-                  .WithMany()
-                  .HasForeignKey(p => p.UserId)
-                  .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Purchase>(entity =>
+       {
+           entity.HasOne(p => p.User)
+                 .WithMany()
+                 .HasForeignKey(p => p.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(p => p.Stock)
-                  .WithMany()
-                  .HasForeignKey(p => p.StockSymbol)
-                  .HasPrincipalKey(s => s.Symbol)
-                  .OnDelete(DeleteBehavior.Restrict);
-        });
+           entity.HasOne(p => p.Stock)
+                 .WithMany()
+                 .HasForeignKey(p => p.StockSymbol)
+                 .HasPrincipalKey(s => s.Symbol)
+                 .OnDelete(DeleteBehavior.Restrict);
+       });
+
+        //precision for decimal fields
+        modelBuilder.Entity<StockPrice>()
+   .Property(sp => sp.Open)
+   .HasPrecision(18, 6);
+
+        modelBuilder.Entity<StockPrice>()
+           .Property(sp => sp.High)
+           .HasPrecision(18, 6);
+
+        modelBuilder.Entity<StockPrice>()
+           .Property(sp => sp.Low)
+           .HasPrecision(18, 6);
+
+        modelBuilder.Entity<StockPrice>()
+           .Property(sp => sp.Close)
+           .HasPrecision(18, 6);
+
+
+
+        modelBuilder.Entity<StockPrice>()
+           .Property(sp => sp.Volume)
+           .HasPrecision(20, 0);
+
+        // Configure relationships
+        modelBuilder.Entity<Stock>();
+        //Purchase decimal properties
+modelBuilder.Entity<Purchase>()
+   .Property(p => p.PurchasePrice)
+   .HasPrecision(18, 6);
+
+modelBuilder.Entity<Purchase>()
+   .Property(p => p.PurchaseValue)
+   .HasPrecision(18, 6);
+
+modelBuilder.Entity<Purchase>()
+   .Property(p => p.Quantity)
+   .HasPrecision(18, 6);
+
+// Stock decimal properties
+modelBuilder.Entity<Stock>()
+   .Property(s => s.BookValue)
+   .HasPrecision(18, 6);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.ChangePercentage)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.DividendRate)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.DividendYield)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.ExpenseRatio)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.MarketCap)
+   .HasPrecision(24, 2);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.PeRatio)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.PriceToBook)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.ROA)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.ROE)
+   .HasPrecision(10, 4);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.SharePrice)
+   .HasPrecision(18, 6);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.TotalAssets)
+   .HasPrecision(24, 2);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.TotalDebt)
+   .HasPrecision(24, 2);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.fiftyTwoWeekHigh)
+   .HasPrecision(18, 6);
+
+modelBuilder.Entity<Stock>()
+   .Property(s => s.fiftyTwoWeekLow)
+   .HasPrecision(18, 6);
+
+// StockDividend decimal properties
+modelBuilder.Entity<StockDividend>()
+   .Property(d => d.Amount)
+   .HasPrecision(18, 6);
     }
+
 }

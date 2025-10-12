@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "alertservice",
+    "ASPNETCORE",
     "authguard",
     "BZVEA",
     "cachedstocks",
@@ -14,6 +15,7 @@
     "fontawesome",
     "getstock",
     "getwatchlist",
+    "healthcheck",
     "highcharts",
     "huburl",
     "logoutbtn",

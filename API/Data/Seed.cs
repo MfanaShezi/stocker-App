@@ -37,8 +37,10 @@ namespace API.Data
 
         public async Task SeedStocksAsync()
         {
+            Console.WriteLine("seeding stocks");
             // Fetch tradable assets
             var assets = await _alpacaClient.ListAssetsAsync(new AssetsRequest());
+            //var assets = await _alpacaClient.ListAssetsAsync(new AssetsRequest { AssetClass = AssetClass.UsEquity });
             // int counter = 0;
 
             foreach (var asset in assets)
@@ -60,6 +62,7 @@ namespace API.Data
             }
 
             await _context.SaveChangesAsync();
+             Console.WriteLine("seeding stocks completed");
         }
 
         public async Task LoadGeneralNews()
@@ -257,7 +260,7 @@ namespace API.Data
                                     StockId = stock.Id,
                                     Stock = stock, // Set the required Stock property
                                     Title = news.Title,
-                                    Link = news.Link!,
+                                    Link = news.Link ?? "https://placeholder-link.com",
                                     Published = news.Published
                                 });
 
@@ -393,7 +396,7 @@ namespace API.Data
                                 StockId = stock.Id,
                                 Stock = stock,
                                 Title = news.Title!,
-                                Link = news.Link!,
+                                Link = news.Link ?? "https://placeholder-link.com",
                                 Published = news.Published
                             }).ToList();
 
@@ -629,7 +632,7 @@ namespace API.Data
                                     StockId = stock.Id,
                                     Stock = stock, // Set the required Stock property
                                     Title = news.Title!,
-                                    Link = news.Link!,
+                                    Link = news.Link ?? "https://placeholder-link.com",
                                     Published = news.Published,
 
                                 });
@@ -675,7 +678,7 @@ namespace API.Data
             Console.WriteLine("All operations completed!");
         }
 
-        public async Task SeedUsersAndWatchlists(UserManager<User> userManager)
+        public async Task SeedUsers(UserManager<User> userManager)
         {
             // Create 3 users
             var users = new List<User>
@@ -700,49 +703,6 @@ namespace API.Data
                 }
 
             }
-
-            // Fetch 15 random stocks from the database
-            var stocks = await _context.Stocks.Take(15).ToListAsync();
-
-            if (stocks.Count < 15)
-            {
-                Console.WriteLine("Not enough stocks in the database to populate watchlists.");
-                return;
-            }
-
-            // Assign 5 stocks to each user's watchlist
-            for (int i = 0; i < users.Count; i++)
-            {
-                var user = users[i];
-                var userEntity = await userManager.FindByIdAsync(user.Id.ToString());
-
-                if (userEntity != null)
-                {
-                    // Create a watchlist for the user
-                    var watchList = new WatchList
-                    {
-                        UserId = userEntity.Id, // Associate with the user's ID
-                        User = userEntity
-                    };
-
-                    await _context.WatchLists.AddAsync(watchList);
-                    await _context.SaveChangesAsync(); // Save to get the WatchListId
-
-                    var watchlistStocks = stocks.Skip(i * 5).Take(5).ToList();
-
-                    foreach (var stock in watchlistStocks)
-                    {
-                        _context.WatchListStocks.Add(new WatchListStock
-                        {
-                            WatchListId = watchList.Id, // Associate with the user's watchlist
-                            StockId = stock.Id
-                        });
-                    }
-
-                    Console.WriteLine($"Added 5 stocks to {user.Email}'s watchlist.");
-                }
-            }
-
 
             //Assign investment style to each user
             for (int i = 0; i < users.Count; i++)
@@ -778,6 +738,53 @@ namespace API.Data
             // Save changes to the database
             await _context.SaveChangesAsync();
             Console.WriteLine("Users and watchlists seeded successfully.");
+        }
+
+        public async Task seedWatchlist(UserManager<User> userManager)
+        {
+             // Fetch 15 random stocks from the database
+            var stocks = await _context.Stocks.Take(15).ToListAsync();
+
+            if (stocks.Count < 15)
+            {
+                Console.WriteLine("Not enough stocks in the database to populate watchlists.");
+                return;
+            }
+
+            var users = await _context.Users.ToListAsync();
+
+            // Assign 5 stocks to each user's watchlist
+            for (int i = 0; i < users.Count; i++)
+            {
+                var user = users[i];
+                var userEntity = await userManager.FindByIdAsync(user.Id.ToString());
+
+                if (userEntity != null)
+                {
+                    // Create a watchlist for the user
+                    var watchList = new WatchList
+                    {
+                        UserId = userEntity.Id, // Associate with the user's ID
+                        User = userEntity
+                    };
+
+                    await _context.WatchLists.AddAsync(watchList);
+                    await _context.SaveChangesAsync(); // Save to get the WatchListId
+
+                    var watchlistStocks = stocks.Skip(i * 5).Take(5).ToList();
+
+                    foreach (var stock in watchlistStocks)
+                    {
+                        _context.WatchListStocks.Add(new WatchListStock
+                        {
+                            WatchListId = watchList.Id, // Associate with the user's watchlist
+                            StockId = stock.Id
+                        });
+                    }
+
+                    Console.WriteLine($"Added 5 stocks to {user.Email}'s watchlist.");
+                }
+            }
         }
 
         // Add this method to your Seed.cs class

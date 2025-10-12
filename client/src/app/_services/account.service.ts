@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { map } from 'rxjs';
 import { InvestmentStyle, RegisterUser, User } from '../_models/User';
-import { environment } from '../../environments/environment.development';
 import { StockService } from './stock.service';
 import { AlertService } from './alert.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

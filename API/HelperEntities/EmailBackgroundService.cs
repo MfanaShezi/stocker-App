@@ -12,12 +12,13 @@ public class EmailBackgroundService : BackgroundService
 
     private readonly ILogger<EmailBackgroundService> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly SeedingState _seedingState;
 
-    public EmailBackgroundService( ILogger<EmailBackgroundService> logger,IServiceScopeFactory scopeFactory)
+    public EmailBackgroundService(ILogger<EmailBackgroundService> logger, IServiceScopeFactory scopeFactory, SeedingState seedingState)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
-       
+         _seedingState = seedingState;
     }
 
     
@@ -28,6 +29,8 @@ public class EmailBackgroundService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+             // Wait for seeding to complete before starting
+             await _seedingState.WaitForSeedingAsync(stoppingToken);
             try
             {
                 // Create a scope when needed, dispose it when done
@@ -41,12 +44,12 @@ public class EmailBackgroundService : BackgroundService
                     // Process alerts or periodic emails
                     await CheckPriceAlerts(stockRepository, context, emailService);
                     if (DateTime.Now.DayOfWeek == DayOfWeek.Friday && DateTime.Now.Hour == 10)
-                     {
+                    {
                         _logger.LogInformation("It's Friday 8AM - time to send weekly summaries");
                         await SendWeeklyPortfolioSummaries(stockRepository, context, emailService);
                     }
                 }
-                
+
                 // Wait for next check
                 await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }

@@ -2,21 +2,22 @@
   "version": 3,
   "targets": {
     "net8.0": {
-      "Alpaca.Markets/7.2.0": {
+      "Alpaca.Markets/8.0.0-beta4": {
         "type": "package",
         "dependencies": {
+          "MessagePack": "3.1.4",
           "Newtonsoft.Json": "13.0.3",
-          "Polly": "8.5.0",
-          "System.IO.Pipelines": "9.0.0",
-          "System.Threading.Channels": "9.0.0"
+          "Polly": "8.6.3",
+          "System.IO.Pipelines": "9.0.8",
+          "System.Threading.Channels": "9.0.8"
         },
         "compile": {
-          "lib/net6.0/Alpaca.Markets.dll": {
+          "lib/net8.0/Alpaca.Markets.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/Alpaca.Markets.dll": {
+          "lib/net8.0/Alpaca.Markets.dll": {
             "related": ".xml"
           }
         }
@@ -219,6 +220,43 @@
           "lib/netstandard2.0/MedallionTopologicalSort.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "MessagePack/3.1.4": {
+        "type": "package",
+        "dependencies": {
+          "MessagePack.Annotations": "3.1.4",
+          "MessagePackAnalyzer": "3.1.4",
+          "Microsoft.NET.StringTools": "17.11.4"
+        },
+        "compile": {
+          "lib/net8.0/MessagePack.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MessagePack.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MessagePack.Annotations/3.1.4": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/MessagePack.Annotations.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/MessagePack.Annotations.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MessagePackAnalyzer/3.1.4": {
+        "type": "package",
+        "build": {
+          "build/_._": {}
         }
       },
       "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.4": {
@@ -1215,6 +1253,19 @@
           }
         }
       },
+      "Microsoft.NET.StringTools/17.11.4": {
+        "type": "package",
+        "compile": {
+          "ref/net8.0/_._": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.NET.StringTools.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Microsoft.NETCore.Platforms/5.0.0": {
         "type": "package",
         "compile": {
@@ -1432,10 +1483,10 @@
           }
         }
       },
-      "Polly/8.5.0": {
+      "Polly/8.6.3": {
         "type": "package",
         "dependencies": {
-          "Polly.Core": "8.5.0"
+          "Polly.Core": "8.6.3"
         },
         "compile": {
           "lib/net6.0/_._": {
@@ -1448,7 +1499,7 @@
           }
         }
       },
-      "Polly.Core/8.5.0": {
+      "Polly.Core/8.6.3": {
         "type": "package",
         "compile": {
           "lib/net8.0/_._": {
@@ -1867,7 +1918,7 @@
           }
         }
       },
-      "System.IO.Pipelines/9.0.0": {
+      "System.IO.Pipelines/9.0.8": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.IO.Pipelines.dll": {
@@ -2128,7 +2179,7 @@
           "buildTransitive/net6.0/System.Text.Json.targets": {}
         }
       },
-      "System.Threading.Channels/9.0.0": {
+      "System.Threading.Channels/9.0.8": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.Threading.Channels.dll": {
@@ -2171,21 +2222,21 @@
     }
   },
   "libraries": {
-    "Alpaca.Markets/7.2.0": {
-      "sha512": "XlrIrXXkcZG9EK9bERIzwsXb08BcKYDMP3S93znYadOK+xlQOr9Jfp4E/dVNORnmevCIyP5cy/nReOMmoIPXkA==",
+    "Alpaca.Markets/8.0.0-beta4": {
+      "sha512": "0dUHvOgLBN1bY5NzZZNqr2zVi4UnItT9++Kxi7Far+2zLQ7JtxbvRUW+mnkHJ7ys0RIMMEpd8inizxKU8d4s7Q==",
       "type": "package",
-      "path": "alpaca.markets/7.2.0",
+      "path": "alpaca.markets/8.0.0-beta4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
-        "alpaca.markets.7.2.0.nupkg.sha512",
+        "alpaca.markets.8.0.0-beta4.nupkg.sha512",
         "alpaca.markets.nuspec",
         "icon.png",
         "lib/net462/Alpaca.Markets.dll",
         "lib/net462/Alpaca.Markets.xml",
-        "lib/net6.0/Alpaca.Markets.dll",
-        "lib/net6.0/Alpaca.Markets.xml",
+        "lib/net8.0/Alpaca.Markets.dll",
+        "lib/net8.0/Alpaca.Markets.xml",
         "lib/netstandard2.0/Alpaca.Markets.dll",
         "lib/netstandard2.0/Alpaca.Markets.xml",
         "lib/netstandard2.1/Alpaca.Markets.dll",
@@ -2431,6 +2482,54 @@
         "lib/netstandard2.0/MedallionTopologicalSort.xml",
         "medalliontopologicalsort.1.0.0.nupkg.sha512",
         "medalliontopologicalsort.nuspec"
+      ]
+    },
+    "MessagePack/3.1.4": {
+      "sha512": "BH0wlHWmVoZpbAPyyt2Awbq30C+ZsS3eHSkYdnyUAbqVJ22fAJDzn2xTieBeoT5QlcBzp61vHcv878YJGfi3mg==",
+      "type": "package",
+      "path": "messagepack/3.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net472/MessagePack.dll",
+        "lib/net472/MessagePack.xml",
+        "lib/net8.0/MessagePack.dll",
+        "lib/net8.0/MessagePack.xml",
+        "lib/net9.0/MessagePack.dll",
+        "lib/net9.0/MessagePack.xml",
+        "lib/netstandard2.0/MessagePack.dll",
+        "lib/netstandard2.0/MessagePack.xml",
+        "lib/netstandard2.1/MessagePack.dll",
+        "lib/netstandard2.1/MessagePack.xml",
+        "messagepack.3.1.4.nupkg.sha512",
+        "messagepack.nuspec"
+      ]
+    },
+    "MessagePack.Annotations/3.1.4": {
+      "sha512": "aVWrDAkCdqxwQsz/q0ldPh2EFn48M99YUzE9OvZjMq2RNLKz4o2z88iGFvSvbMqOWRweRvKPHBJZe22PRqzslQ==",
+      "type": "package",
+      "path": "messagepack.annotations/3.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/MessagePack.Annotations.dll",
+        "lib/netstandard2.0/MessagePack.Annotations.xml",
+        "messagepack.annotations.3.1.4.nupkg.sha512",
+        "messagepack.annotations.nuspec"
+      ]
+    },
+    "MessagePackAnalyzer/3.1.4": {
+      "sha512": "CTaSsN/liJ7MhLCAB7Z4ZLBNuVGCq9lt2BT/cbrc9vzGv89yK3CqIA+z9T19a11eQYl9etZHL6MQJgCqECRVpg==",
+      "type": "package",
+      "path": "messagepackanalyzer/3.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/roslyn4.3/cs/MessagePack.Analyzers.CodeFixes.dll",
+        "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
+        "build/MessagePackAnalyzer.targets",
+        "messagepackanalyzer.3.1.4.nupkg.sha512",
+        "messagepackanalyzer.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.4": {
@@ -3934,6 +4033,35 @@
         "microsoft.identitymodel.tokens.nuspec"
       ]
     },
+    "Microsoft.NET.StringTools/17.11.4": {
+      "sha512": "mudqUHhNpeqIdJoUx2YDWZO/I9uEDYVowan89R6wsomfnUJQk6HteoQTlNjZDixhT2B4IXMkMtgZtoceIjLRmA==",
+      "type": "package",
+      "path": "microsoft.net.stringtools/17.11.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "MSBuild-NuGet-Icon.png",
+        "README.md",
+        "lib/net472/Microsoft.NET.StringTools.dll",
+        "lib/net472/Microsoft.NET.StringTools.pdb",
+        "lib/net472/Microsoft.NET.StringTools.xml",
+        "lib/net8.0/Microsoft.NET.StringTools.dll",
+        "lib/net8.0/Microsoft.NET.StringTools.pdb",
+        "lib/net8.0/Microsoft.NET.StringTools.xml",
+        "lib/netstandard2.0/Microsoft.NET.StringTools.dll",
+        "lib/netstandard2.0/Microsoft.NET.StringTools.pdb",
+        "lib/netstandard2.0/Microsoft.NET.StringTools.xml",
+        "microsoft.net.stringtools.17.11.4.nupkg.sha512",
+        "microsoft.net.stringtools.nuspec",
+        "notices/THIRDPARTYNOTICES.txt",
+        "ref/net472/Microsoft.NET.StringTools.dll",
+        "ref/net472/Microsoft.NET.StringTools.xml",
+        "ref/net8.0/Microsoft.NET.StringTools.dll",
+        "ref/net8.0/Microsoft.NET.StringTools.xml",
+        "ref/netstandard2.0/Microsoft.NET.StringTools.dll",
+        "ref/netstandard2.0/Microsoft.NET.StringTools.xml"
+      ]
+    },
     "Microsoft.NETCore.Platforms/5.0.0": {
       "sha512": "VyPlqzH2wavqquTcYpkIIAQ6WdenuKoFN0BdYBbCWsclXacSOHNQn66Gt4z5NBqEYW0FAPm5rlvki9ZiCij5xQ==",
       "type": "package",
@@ -4193,13 +4321,14 @@
         "postgresql.png"
       ]
     },
-    "Polly/8.5.0": {
-      "sha512": "GBNZPy7i7OpkaIruWPRJ0+AWzdGDQDnKY91b7Ic2aAch4lKhPjUc5KSffpH9krIWe0MoyghqaRxwRC0Uwz2PkA==",
+    "Polly/8.6.3": {
+      "sha512": "8X6mWAGDrgTHyqDthifiv9QGR+FgnRe13/sPhSR4ZbhXCqUDJuLrVqunB39LLbf87TXZ+06dMdopd6LpY4oK0w==",
       "type": "package",
-      "path": "polly/8.5.0",
+      "path": "polly/8.6.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "LICENSE",
         "lib/net462/Polly.dll",
         "lib/net462/Polly.pdb",
         "lib/net462/Polly.xml",
@@ -4214,17 +4343,18 @@
         "lib/netstandard2.0/Polly.xml",
         "package-icon.png",
         "package-readme.md",
-        "polly.8.5.0.nupkg.sha512",
+        "polly.8.6.3.nupkg.sha512",
         "polly.nuspec"
       ]
     },
-    "Polly.Core/8.5.0": {
-      "sha512": "VYYMZNitZ85UEhwOKkTQI63WEMvzUqwQc74I2mm8h/DBVAMcBBxqYPni4DmuRtbCwngmuONuK2yBJfWNRKzI+A==",
+    "Polly.Core/8.6.3": {
+      "sha512": "xRlcE+1FidqIfZ7zxBT6klSblJ/7MAJq1x5yvYoLnwNhs8Xc2gp3Srf8wHG2NpFxVBqrldc3svhkMPJjSzTmzw==",
       "type": "package",
-      "path": "polly.core/8.5.0",
+      "path": "polly.core/8.6.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "LICENSE",
         "lib/net462/Polly.Core.dll",
         "lib/net462/Polly.Core.pdb",
         "lib/net462/Polly.Core.xml",
@@ -4242,7 +4372,7 @@
         "lib/netstandard2.0/Polly.Core.xml",
         "package-icon.png",
         "package-readme.md",
-        "polly.core.8.5.0.nupkg.sha512",
+        "polly.core.8.6.3.nupkg.sha512",
         "polly.core.nuspec"
       ]
     },
@@ -4743,10 +4873,10 @@
         "version.txt"
       ]
     },
-    "System.IO.Pipelines/9.0.0": {
-      "sha512": "eA3cinogwaNB4jdjQHOP3Z3EuyiDII7MT35jgtnsA4vkn0LUrrSHsU0nzHTzFzmaFYeKV7MYyMxOocFzsBHpTw==",
+    "System.IO.Pipelines/9.0.8": {
+      "sha512": "6vPmJt73mgUo1gzc/OcXlJvClz/2jxZ4TQPRfriVaLoGRH2mye530D9WHJYbFQRNMxF3PWCoeofsFdCyN7fLzA==",
       "type": "package",
-      "path": "system.io.pipelines/9.0.0",
+      "path": "system.io.pipelines/9.0.8",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4766,7 +4896,7 @@
         "lib/net9.0/System.IO.Pipelines.xml",
         "lib/netstandard2.0/System.IO.Pipelines.dll",
         "lib/netstandard2.0/System.IO.Pipelines.xml",
-        "system.io.pipelines.9.0.0.nupkg.sha512",
+        "system.io.pipelines.9.0.8.nupkg.sha512",
         "system.io.pipelines.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -5268,10 +5398,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Threading.Channels/9.0.0": {
-      "sha512": "hzACdIf1C+4Dqos5ijV404b94+LqfIC8nfS3mNpCDFWowb1N3PNfJPopneq32ahWlDeyaPZJqjBk76YFR69Rpg==",
+    "System.Threading.Channels/9.0.8": {
+      "sha512": "kpvkzWJoHR9os3/4LL5feaTTLD92+XzTqPyYLU2tw2BoJ4MrWCfkjGXtL7MsdpV/20e1+SamCbrPj2L9ptwgBA==",
       "type": "package",
-      "path": "system.threading.channels/9.0.0",
+      "path": "system.threading.channels/9.0.8",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5293,7 +5423,7 @@
         "lib/netstandard2.0/System.Threading.Channels.xml",
         "lib/netstandard2.1/System.Threading.Channels.dll",
         "lib/netstandard2.1/System.Threading.Channels.xml",
-        "system.threading.channels.9.0.0.nupkg.sha512",
+        "system.threading.channels.9.0.8.nupkg.sha512",
         "system.threading.channels.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -5350,13 +5480,14 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "Alpaca.Markets >= 7.2.0",
+      "Alpaca.Markets >= 8.0.0-beta4",
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 12.0.1",
       "EFCore.BulkExtensions >= 8.0.4",
       "MailKit >= 4.14.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.4",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.4",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.4",
+      "Microsoft.EntityFrameworkCore.SqlServer >= 8.0.5",
       "Microsoft.EntityFrameworkCore.Sqlite >= 8.0.4",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.4",
       "YahooFinanceApi >= 2.3.3"
@@ -5416,7 +5547,7 @@
         "dependencies": {
           "Alpaca.Markets": {
             "target": "Package",
-            "version": "[7.2.0, )"
+            "version": "[8.0.0-beta4, )"
           },
           "AutoMapper.Extensions.Microsoft.DependencyInjection": {
             "target": "Package",
@@ -5441,6 +5572,10 @@
           "Microsoft.EntityFrameworkCore.Design": {
             "target": "Package",
             "version": "[8.0.4, )"
+          },
+          "Microsoft.EntityFrameworkCore.SqlServer": {
+            "target": "Package",
+            "version": "[8.0.5, )"
           },
           "Microsoft.EntityFrameworkCore.Sqlite": {
             "target": "Package",

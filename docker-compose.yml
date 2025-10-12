@@ -1,0 +1,46 @@
+
+
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: stocker-sql
+    environment:
+      TZ: "Africa/Johannesburg" 
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Password@1"
+    ports:
+      - "14333:1433"
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "SA", "-P", "Password@1", "-C" ,"-Q", "SELECT 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - sql-data:/var/opt/mssql
+  
+  api:
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    container_name: stocker-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sql;Database=StockerApp;User Id=sa;Password=Password@1;TrustServerCertificate=True
+    ports:
+      - "5000:8080"
+    depends_on:
+      sql:
+        condition: service_healthy
+  
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: stocker-client
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+
+volumes:
+  sql-data:
