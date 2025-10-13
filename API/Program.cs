@@ -50,7 +50,7 @@ var app = builder.Build();
 //Middleware configuration
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
-.WithOrigins("http://localhost:4200", "https://localhost:4200"));
+.WithOrigins("http://localhost:4200", "https://localhost:4200","http://localhost:80"));
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -73,17 +73,17 @@ using (var scope = app.Services.CreateScope())
         db.Database.Migrate();
         var seed = services.GetRequiredService<Seed>();
         Console.WriteLine("starting database seeding");
-        //await seed.SeedUsers(userManager);
-        //await seed.LoadGeneralNews();
-        //await seed.SeedStocksAsync();
-       // await seed.FetchAndStoreStockDataParallel();
+        await seed.SeedUsers(userManager);
+        await seed.LoadGeneralNews();
+        await seed.SeedStocksAsync();
+        await seed.FetchAndStoreStockDataParallel();
        
-        //await seed.seedWatchlist(userManager); // seedWatchlist
-        //await seed.SeedUsersAndWatchlists(userManager);*no longer exists
-        //await seed.SeedSentimentParallel();
-        // await seed.SeedForumDataAsync();
-        // await seed.CreateAlertsForUsers();
-        // await seed.SeedPurchases();
+        await seed.seedWatchlist(userManager); // seedWatchlist
+      //  await seed.SeedUsersAndWatchlists(userManager);*no longer exists
+        await seed.SeedSentimentParallel();
+        await seed.SeedForumDataAsync();
+        await seed.CreateAlertsForUsers();
+        await seed.SeedPurchases();
         Console.WriteLine("Seeding completed successfully.\n");
         var seedingState = services.GetRequiredService<SeedingState>();
         seedingState.SetSeedingComplete();

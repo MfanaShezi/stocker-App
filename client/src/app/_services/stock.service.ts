@@ -1,11 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { stock } from '../_models/stock';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment.development';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { SentimentResponse } from '../_models/SentimentResponse';
 import { News } from '../_models/news';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

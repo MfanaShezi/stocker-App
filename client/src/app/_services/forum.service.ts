@@ -2,8 +2,8 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { ForumThread, ForumMessage, CreateThread, CreateMessage } from '../_models/forum';
-import { environment } from '../../environments/environment.development';
 import { User } from '../_models/User';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

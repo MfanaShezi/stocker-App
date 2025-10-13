@@ -3,7 +3,8 @@ import { StockService } from './stock.service';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, tap } from 'rxjs';
 import { PortfolioResponse, Purchase } from '../_models/PortfolioResponse';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
+
 
 export interface PortfolioHolding {
   symbol: string;
