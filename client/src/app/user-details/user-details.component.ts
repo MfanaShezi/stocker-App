@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
 import { User } from '../_models/User';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -16,6 +17,8 @@ export class UserDetailsComponent implements OnInit {
   user: User | null = null;
   editMode = false;
   isLoading = false;
+  accountService=inject(AccountService);
+  private toastr = inject(ToastrService);
   
   // Form data for editing
   editForm = {
@@ -25,24 +28,23 @@ export class UserDetailsComponent implements OnInit {
   };
 
   investmentStyleOptions = [
-    'Conservative',
-    'Balanced',
-    'Aggressive'
+    { value: 0, text: this.getInvestmentStyleText(0) },
+    { value: 1, text: this.getInvestmentStyleText(1) },
+    { value: 2, text: this.getInvestmentStyleText(2) }
   ];
-
+  
   riskAppetiteOptions = [
-    'Low',
-    'Medium',
-    'High'
+    { value: 0, text: this.getRiskAppetiteText(0) },
+    { value: 1, text: this.getRiskAppetiteText(1) },
+    { value: 2, text: this.getRiskAppetiteText(2) }
   ];
-
+  
   investmentGoalOptions = [
-    'Retirement',
-    'Growth',
-    'Income'
+    { value: 0, text: this.getInvestmentGoalText(0) },
+    { value: 1, text: this.getInvestmentGoalText(1) },
+    { value: 2, text: this.getInvestmentGoalText(2) }
   ];
 
-  constructor(private accountService: AccountService) {}
 
   ngOnInit() {
     this.loadUserDetails();
@@ -58,11 +60,11 @@ export class UserDetailsComponent implements OnInit {
   populateEditForm() {
     if (this.user) {
       this.editForm = {
-        investmentStyle: this.user.investmentStyle || '',
-        riskAppetite: this.user.riskAppetite|| '',
-        investmentGoal: this.user.investmentGoal || '',
-    
+        investmentStyle: this.user && typeof this.user.investmentStyle === 'number' ? (this.user.investmentStyle as number).toString() : '',
+        riskAppetite: typeof this.user?.riskAppetite === 'number' ? (this.user.riskAppetite as number).toString() : '',
+        investmentGoal: this.user && typeof this.user.investmentGoal === 'number' ? (this.user.investmentGoal as number).toString() : '',
       };
+      console.log('Form populated with:', this.editForm);
     }
   }
 
@@ -72,6 +74,7 @@ export class UserDetailsComponent implements OnInit {
       this.populateEditForm();
     }
   }
+  
 
   cancelEdit() {
     this.editMode = false;
@@ -79,43 +82,37 @@ export class UserDetailsComponent implements OnInit {
   }
 
   updateUserDetails() {
-    if (!this.user) return;
+    if (!this.editForm) return;
     
     this.isLoading = true;
     
-    // Create patch object with only changed fields
-    const patchData: any = {};
-   
-    if (this.editForm.investmentStyle !== this.user.investmentStyle) {
-      patchData.investmentStyle = this.editForm.investmentStyle;
-    }
-    if (this.editForm.riskAppetite !== this.user.riskAppetite) {
-      patchData.riskAppetite = this.editForm.riskAppetite;
-    }
-    if (this.editForm.investmentGoal !== this.user.investmentGoal) {
-      patchData.investmentGoal = this.editForm.investmentGoal;
-    }
-
-
-    if (Object.keys(patchData).length === 0) {
-      console.log('No changes detected');
-      this.editMode = false;
-      this.isLoading = false;
-      return;
-    }
-
-    // this.accountService.updateUserProfile(patchData).subscribe({
-    //   next: (updatedUser) => {
-    //     console.log('Profile updated successfully');
-    //     this.user = updatedUser;
-    //     this.editMode = false;
-    //     this.isLoading = false;
-    //   },
-    //   error: (error) => {
-    //     console.error('Error updating profile:', error);
-    //     this.isLoading = false;
-    //   }
-    // });
+    // Create the data to send to the API
+    const patchData = {
+      investmentStyle: this.editForm.investmentStyle,
+      riskAppetite: this.editForm.riskAppetite,
+      investmentGoal: this.editForm.investmentGoal
+      // Add any other fields that need updating
+    };
+    
+    // Call the account service to update the user
+    this.accountService.update(patchData).subscribe({
+      next: (updatedUser) => {
+        console.log('Profile updated successfully');
+        this.user = updatedUser;
+        this.editMode = false;
+        this.isLoading = false;
+        
+        // Optionally show success message
+        this.toastr.success('Your profile has been updated successfully');
+      },
+      error: (error) => {
+        console.error('Error updating profile:', error);
+        this.isLoading = false;
+        
+        // Show error message to the user
+        this.toastr.error(error.error?.message || 'Failed to update profile. Please try again.');
+      }
+    });
   }
 
   //helper methods
@@ -151,4 +148,6 @@ export class UserDetailsComponent implements OnInit {
       default: return 'Not specified';
     }
   }
+
+  
 }

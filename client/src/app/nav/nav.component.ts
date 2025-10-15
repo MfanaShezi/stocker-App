@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AccountService } from '../_services/account.service';
 import { StockService } from '../_services/stock.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-nav',
   standalone: true,
-  imports: [FormsModule,RouterLink,RouterLinkActive],
+  imports: [FormsModule,RouterLink,RouterLinkActive,CommonModule],
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.css'
 })
@@ -33,11 +34,15 @@ logout() {
   this.router.navigateByUrl('/');
 }
 
+// Add a loading state property
+isSearching = false;
 onSearch(): void {
   const symbol = this.searchTerm.trim().toUpperCase();
+  this.isSearching = true;
   if (symbol) {
     this.stockservice.getstockBySymbol(symbol).subscribe({
       next: (stock) => {
+        this.isSearching = false;
         if (stock) {
           // Stock found, navigate to stock detail page using the stock ID
           this.router.navigate(['/stocks', stock.id]);
@@ -50,6 +55,7 @@ onSearch(): void {
         this.searchTerm = '';
       },
       error: (error) => {
+        this.isSearching = false;
         console.error('Error searching for stock:', error);
         alert(`Error searching for "${symbol}". Please try again.`);
         this.searchTerm = '';

@@ -1,6 +1,7 @@
 using System;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using API.Interfaces;
 using AutoMapper;
 using Humanizer;
@@ -59,6 +60,43 @@ public class AccountController(UserManager<User> userManager, ITokenService toke
             InvestmentStyle = (InvestmentStyle)user.InvestmentStyle!
         };
     }
+
+[HttpPatch("update")]
+public async Task<ActionResult<UserDto>> UpdateUser(UpdateUserDto updateDto)
+{
+    // Get the current user from the token
+    var username = HttpContext.User.GetUsername();
+    
+    var user = await userManager.Users.FirstOrDefaultAsync(x => x.UserName == username);
+    
+    if (user == null) return NotFound("User not found");
+
+    // Update user properties
+    if (updateDto.InvestmentStyle.HasValue)
+        user.InvestmentStyle = updateDto.InvestmentStyle.Value;
+    
+    if (updateDto.RiskAppetite.HasValue)
+        user.RiskAppetite = updateDto.RiskAppetite.Value;
+    
+    if (updateDto.InvestmentGoal.HasValue)
+        user.InvestmentGoal =updateDto.InvestmentGoal.Value;
+    
+    // Save changes
+    var result = await userManager.UpdateAsync(user);
+    
+    if (!result.Succeeded) return BadRequest(result.Errors);
+
+    // Return updated user information
+    return new UserDto
+    {
+        Username = user.UserName,
+        Email = user.Email,
+        Token = await tokenService.CreateToken(user),
+        RiskAppetite = (RiskAppetite)(user.RiskAppetite ?? default),
+        InvestmentGoal = (InvestmentGoal)user.InvestmentGoal,
+        InvestmentStyle = (InvestmentStyle)user.InvestmentStyle
+    };
+}
 
 
     private async Task<bool> UserExists(RegisterDto registerDTO)

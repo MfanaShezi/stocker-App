@@ -75,6 +75,7 @@
             <button 
              class="btn btn-outline-primary"
              [disabled]="!canAdd()"
+              (click)="addToWatchlist(stock)"
              >Add to Watchlist
             </button>
             <button class="btn btn-outline-info"
@@ -332,7 +333,20 @@
     </div>
   </div>
 </div>
-
+<!-- Sentiment Legend -->
+<div class="sentiment-legend mt-4">
+  <h6><i class="fas fa-info-circle me-2"></i>How to Read Sentiment</h6>
+  <div class="legend-item mb-2">
+    <p class="small">Sentiment is calculated based on the ratio of positive, negative to neutral articles:</p>
+    <ul class="small">
+      <li><span class="badge bg-success"><i class="fas fa-smile me-1"></i> Positive</span> - Over 60% positive articles</li>
+      <li><span class="badge bg-danger"><i class="fas fa-frown me-1"></i> Negative</span> - Over 60% negative articles</li>
+      <li><span class="badge bg-light text-dark"><i class="fas fa-meh me-1"></i> Neutral</span> Over 60% neutral articles</li>
+      <li><span class="badge bg-warning text-dark"><i class="fas fa-meh me-1"></i> Inconclusive</span> Neither threshold is met</li>
+    </ul>
+    <p class="small fst-italic">This analysis helps gauge market sentiment toward the stock based on news articles from MarketAux</p>
+  </div>
+</div>
 <!-- News Carousel Section -->
 <div class="row mt-4" *ngIf="stock && stock.news && stock.news.length > 0">
   <div class="col-12">

@@ -63,6 +63,19 @@ export class AccountService {
     this.alertservice.clearAlertCache();
   }
   
+  update(updateData: any) {
+    return this.http.patch<User>(this.baseUrl + 'account/update', updateData).pipe(
+      map(updatedUser => {
+        if (updatedUser) {
+          // Update the stored user with new data
+          const currentUserData = this.currentUser();
+          const updatedUserData = {...currentUserData, ...updatedUser};
+          this.setCurrentUser(updatedUserData);
+        }
+        return updatedUser;
+      })
+    );
+  }
   
   
 }

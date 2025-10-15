@@ -62,10 +62,11 @@
                       id="investmentStyle" 
                       class="form-select" 
                       [(ngModel)]="editForm.investmentStyle"
+                     
                       name="investmentStyle">
                       <option value="" disabled>Select Investment Style</option>
-                      <option *ngFor="let style of investmentStyleOptions" [value]="style">
-                        {{style}}
+                      <option *ngFor="let style of investmentStyleOptions" [ngValue]="style.value">
+                        {{style.text}}
                       </option>
                     </select>
                   </div>
@@ -76,10 +77,11 @@
                       id="riskAppetite" 
                       class="form-select" 
                       [(ngModel)]="editForm.riskAppetite"
+                     
                       name="riskAppetite">
                       <option value="">Select Risk Level</option>
-                      <option *ngFor="let risk of riskAppetiteOptions" [value]="risk">
-                        {{risk}}
+                      <option *ngFor="let risk of riskAppetiteOptions" [ngValue]="risk.value">
+                        {{risk.text}}
                       </option>
                     </select>
                   </div>
@@ -92,8 +94,8 @@
                       [(ngModel)]="editForm.investmentGoal"
                       name="investmentGoal">
                       <option value="">Select Investment Goal</option>
-                      <option *ngFor="let goal of investmentGoalOptions" [value]="goal">
-                        {{goal}}
+                      <option *ngFor="let goal of investmentGoalOptions" [ngValue]="goal.value">
+                        {{goal.text}}
                       </option>
                     </select>
                   </div>

@@ -47,6 +47,7 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
   private portfolioService = inject(PortfolioService);
   private alertService = inject(AlertService);
    private toastr=inject(ToastrService);
+   stockservice = inject(StockService);
 
 
     showAlertModal = false;
@@ -128,21 +129,31 @@ export class StockDetailComponent implements OnInit, AfterViewInit {
         });
       }
 
-      // async toggleWatchlist() {
-      //   if (!this.stock) return;
-    
-      //   try {
-      //     if (this.canAdd()) {
-      //       // Add to watchlist
-      //       await this.stockService.addToWatchlist(this.stock.symbol).toPromise();
-      //     } else {
-      //       // Remove from watchlist
-      //       await this.stockService.removeFromWatchlistBySymbol(this.stock.symbol).toPromise();
-      //     }
-      //   } catch (error) {
-      //     console.error('Watchlist toggle error:', error);
-      //   }
-      // }
+      // Add to stock-list.component.ts
+watchlistStocks: Set<number> = new Set();
+isUpdatingWatchlist = false;
+addToWatchlist(stock: stock) {
+  this.isUpdatingWatchlist = true;
+  if (stock.id !== undefined) {
+    this.stockservice.AddToWatchlist(stock.id).subscribe({
+      next: (response) => {
+        console.log('Successfully added to watchlist:', stock.symbol);
+        this.watchlistStocks.add(stock.id!);
+        this.isUpdatingWatchlist = false;
+        this.toastr.success(`${stock.symbol} added to watchlist`);
+      },
+      error: (error) => {
+        console.error('Error adding to watchlist:', error);
+        this.isUpdatingWatchlist = false;
+       
+        this.toastr.error('Failed to add to watchlist');
+      }
+    });
+  } else {
+    console.error('Stock ID is undefined, cannot add to watchlist.');
+  }
+  console.log('Adding to watchlist:', stock.symbol);
+}
     
   ngOnInit(): void {
     
