@@ -9,12 +9,12 @@ import { StockService } from '../_services/stock.service';
 import { BaseChartDirective } from 'ng2-charts';
 import { stock } from '../_models/stock';
 import { StockAnalysisService } from '../_services/stock-analysis.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule,FormsModule,BaseChartDirective],
+  imports: [CommonModule,FormsModule,BaseChartDirective,RouterLink],
   templateUrl: './portfolio.component.html',
   styleUrl: './portfolio.component.css'
 })

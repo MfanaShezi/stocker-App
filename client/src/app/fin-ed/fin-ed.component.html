@@ -1,0 +1,233 @@
+<!-- <div class="container mt-4"> -->
+    <!-- <div class="row">
+      <div class="col-12">
+        <h2>Fin-Ed Center</h2>
+        <p class="lead">
+          These financial ratios are used in our stock scoring system to help assess company performance, 
+          financial health, and investment potential.
+        </p>
+      </div>
+    </div> -->
+    <div class="container mt-4">
+        <div class="jumbotron bg-gradient-primary p-4 rounded shadow-sm mb-4">
+          <div class="row align-items-center">
+            <div class="col-md-2 text-center d-none d-md-block">
+              <i class="fas fa-graduation-cap fa-4x text-primary animated-icon"></i>
+            </div>
+            <div class="col-md-10">
+              <h1 class="display-4"><span class="text-primary">Fin-Ed</span> Investing Center</h1>
+              <p class="lead">
+                <i class="fas fa-quote-left text-muted me-2"></i>
+                Decode the Investing lingo and become a savvier investor!
+                <i class="fas fa-quote-right text-muted ms-2"></i>
+              </p>
+              <hr class="my-3">
+              <p>Learn the secret language of financial metrics that the pros use to evaluate investments.</p>
+              <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#beginnerGuide">
+                  <i class="fas fa-star me-1"></i> New to Investing?
+                </button>
+                <!-- <a href="#ratiosAccordion" class="btn btn-outline-light">
+                  <i class="fas fa-chart-line me-1"></i> Jump to Ratios
+                </a> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div class="collapse mb-4" id="beginnerGuide">
+          <div class="card border-warning">
+            <div class="card-header bg-primary text-light">
+              <h4 class="mb-0"><i class="fas fa-lightbulb me-2"></i> Investing 101: The Basics</h4>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <h5><i class="fas fa-1 me-2"></i> Start with Knowledge</h5>
+                  <p>Understanding these financial metrics is your first step to making smarter investment decisions!</p>
+                </div>
+                <div class="col-md-4">
+                  <h5><i class="fas fa-2 me-2"></i> Compare Companies</h5>
+                  <p>Use these ratios to compare different companies in the same industry.</p>
+                </div>
+                <div class="col-md-4">
+                  <h5><i class="fas fa-3 me-2"></i> Make Informed Decisions</h5>
+                  <p>Don't just follow the crowd - use data to back your investment choices!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    <div class="row my-4">
+        <div class="col-12">
+          <div class="alert alert-info">
+            <h5>Why These Metrics Matter in Stock Analysis</h5>
+            <p>These financial metrics help assess a company's overall health, profitability, and risk profile. Our stock scoring system uses these metrics to provide objective analysis of investment opportunities.</p>
+          </div>
+        </div>
+      </div>
+    
+    <div class="accordion" id="ratiosAccordion">
+      <div class="accordion-item" *ngFor="let category of financialRatios; let i = index">
+        <h2 class="accordion-header">
+          <button class="accordion-button" [class.collapsed]="i !== 0" type="button" 
+                  data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" 
+                  [attr.aria-expanded]="i === 0" [attr.aria-controls]="'collapse' + i">
+            {{category.category}}
+          </button>
+        </h2>
+        <div [id]="'collapse' + i" class="accordion-collapse collapse" [class.show]="i === 0" 
+             [attr.aria-labelledby]="'heading' + i" data-bs-parent="#ratiosAccordion">
+          <div class="accordion-body">
+            <div class="card mb-3" *ngFor="let ratio of category.ratios">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">{{ratio.name}}</h5>
+              </div>
+              <div class="card-body">
+                <div class="row mb-3">
+                  <div class="col-md-3 fw-bold">Description:</div>
+                  <div class="col-md-9">{{ratio.description}}</div>
+                </div>
+                
+                <div class="row mb-3">
+                  <div class="col-md-3 fw-bold">Formula:</div>
+                  <div class="col-md-9">{{ratio.formula}}</div>
+                </div>
+                
+                <div class="row mb-3">
+                  <div class="col-md-3 fw-bold">How to Interpret:</div>
+                  <div class="col-md-9">{{ratio.interpretation}}</div>
+                </div>
+                
+                <!-- <div class="row mb-3" *ngIf="ratio.scoringLogic">
+                  <div class="col-md-3 fw-bold">Scoring System:</div>
+                  <div class="col-md-9">{{ratio.scoringLogic}}</div>
+                </div> -->
+                
+                <div class="row">
+                  <div class="col-md-3 fw-bold">Example:</div>
+                  <div class="col-md-9">{{ratio.example}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+          <h3>Additional Resources</h3>
+          <p>Expand your financial knowledge with these helpful resources:</p>
+        </div>
+      </div>
+      
+      <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Educational Websites</h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item"><a href="https://www.investopedia.com/" target="_blank">Investopedia</a> - Comprehensive financial dictionary and educational articles</li>
+                <li class="list-group-item"><a href="https://www.morningstar.com/investing-classroom" target="_blank">Morningstar Investing Classroom</a> - Free courses on investing fundamentals</li>
+                <li class="list-group-item"><a href="https://www.fool.com/investing-basics/" target="_blank">The Motley Fool</a> - Beginner-friendly investment education</li>
+                <li class="list-group-item"><a href="https://www.khanacademy.org/economics-finance-domain/core-finance" target="_blank">Khan Academy Finance</a> - Free courses on finance and investing</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Recommended Books</h5>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">"The Intelligent Investor" by Benjamin Graham</li>
+                  <li class="list-group-item">"Financial Statements: A Step-by-Step Guide" by Thomas Ittelson</li>
+                  <li class="list-group-item">"The Little Book of Common Sense Investing" by John C. Bogle</li>
+                  <li class="list-group-item">"Security Analysis" by Benjamin Graham and David Dodd</li>
+                  <li class="list-group-item">"Value Investing: From Graham to Buffett and Beyond" by Bruce Greenwald</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Free Tools & Calculators</h5>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item"><a href="https://finviz.com/" target="_blank">Finviz</a> - Stock screener with financial ratio filters</li>
+                  <li class="list-group-item"><a href="https://www.macrotrends.net/" target="_blank">MacroTrends</a> - Historical financial data and charts</li>
+                  <li class="list-group-item"><a href="https://www.portfoliovisualizer.com/" target="_blank">Portfolio Visualizer</a> - Portfolio analysis and backtesting tools</li>
+                  <li class="list-group-item"><a href="https://www.tradingview.com/" target="_blank">TradingView</a> - Advanced charting platform with financial data</li>
+                </ul>
+              </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+              <h3>Stock Trading Platforms</h3>
+              <p>Ready to start investing? These platforms allow you to buy and sell stocks with varying fees and features:</p>
+            </div>
+          </div>
+          
+          <div class="row mb-5">
+            <div class="col-md-6 mb-4">
+              <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                  <h5 class="mb-0">Beginner-Friendly Platforms</h5>
+                </div>
+                <div class="card-body">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <a href="https://robinhood.com/" target="_blank">Robinhood</a> - Commission-free trading with a simple interface, popular in the US
+                    </li>
+                    <li class="list-group-item">
+                      <a href="https://www.easyequities.co.za/" target="_blank">Easy Equities</a> - Low-cost platform with fractional shares, popular in South Africa
+                    </li>
+                    <li class="list-group-item">
+                      <a href="https://public.com/" target="_blank">Public</a> - Social investing platform with commission-free trades and community features
+                    </li>
+                    <li class="list-group-item">
+                      <a href="https://www.acorns.com/" target="_blank">Acorns</a> - Automated investing starting with spare change round-ups
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                  <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Full-Featured Brokerages</h5>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item">
+                        <a href="https://www.fidelity.com/" target="_blank">Fidelity</a> - Comprehensive brokerage with excellent research tools and customer service
+                      </li>
+                      <li class="list-group-item">
+                        <a href="https://www.tdameritrade.com/" target="_blank">TD Ameritrade</a> - Robust trading platform with advanced charting and research
+                      </li>
+                      <li class="list-group-item">
+                        <a href="https://www.interactivebrokers.com/" target="_blank">Interactive Brokers</a> - Advanced platform with global market access and lowest margin rates
+                      </li>
+                      <li class="list-group-item">
+                        <a href="https://www.schwab.com/" target="_blank">Charles Schwab</a> - Full-service brokerage with extensive educational resources
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            <div class="col-12 mt-2">
+                <div class="alert alert-warning">
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                  <strong>Disclaimer:</strong> We don't endorse any specific platform. Always research fees, features, and regulations before opening an account. Trading stocks involves risk, including possible loss of principal.
+                </div>
+            </div>
+            
+  </div>

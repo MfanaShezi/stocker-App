@@ -60,9 +60,9 @@ export class UserDetailsComponent implements OnInit {
   populateEditForm() {
     if (this.user) {
       this.editForm = {
-        investmentStyle: this.user && typeof this.user.investmentStyle === 'number' ? (this.user.investmentStyle as number).toString() : '',
-        riskAppetite: typeof this.user?.riskAppetite === 'number' ? (this.user.riskAppetite as number).toString() : '',
-        investmentGoal: this.user && typeof this.user.investmentGoal === 'number' ? (this.user.investmentGoal as number).toString() : '',
+        investmentStyle: this.user.investmentStyle !== undefined ? this.user.investmentStyle : '',
+        riskAppetite: this.user.riskAppetite !== undefined ? this.user.riskAppetite : '',
+        investmentGoal: this.user.investmentGoal !== undefined ? this.user.investmentGoal : '',
       };
       console.log('Form populated with:', this.editForm);
     }

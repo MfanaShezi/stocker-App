@@ -6,12 +6,13 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-alert',
   standalone: true,
-  imports: [DatePipe,CurrencyPipe,CommonModule,FormsModule],
+  imports: [DatePipe,CurrencyPipe,CommonModule,FormsModule,RouterLink],
   templateUrl: './alert.component.html',
   styleUrl: './alert.component.css'
 })
@@ -19,6 +20,7 @@ export class AlertComponent implements OnInit {
 
  private alertService=inject(AlertService);
  private toastr=inject(ToastrService);
+ router=inject(Router);
 
   alerts: Alert[] = [];
   loading = false;
@@ -65,6 +67,10 @@ export class AlertComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  viewStock(stockId: number): void {
+    this.router.navigate(['/stocks', stockId]);
   }
 
   toggleAlert(alert: Alert): void {

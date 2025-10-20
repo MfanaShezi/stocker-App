@@ -1,0 +1,39 @@
+/* .bg-gradient-primary {
+    background: linear-gradient(135deg, #2c3e50, #4ca1af);
+    color: white;
+  }
+  */
+
+  .animated-icon {
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-20px);}
+    60% {transform: translateY(-10px);}
+  }
+  /*
+  .fas.fa-1:before {
+    content: "1";
+    font-weight: bold;
+    border: 2px solid;
+    border-radius: 50%;
+    padding: 0px 6px;
+  }
+  
+  .fas.fa-2:before {
+    content: "2";
+    font-weight: bold;
+    border: 2px solid;
+    border-radius: 50%;
+    padding: 0px 6px;
+  }
+  
+  .fas.fa-3:before {
+    content: "3";
+    font-weight: bold;
+    border: 2px solid;
+    border-radius: 50%;
+    padding: 0px 6px;
+  } */
