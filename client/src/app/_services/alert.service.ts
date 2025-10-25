@@ -15,10 +15,10 @@ cachedAlerts=new Map();
   getAlerts(): Observable<Alert[]> {
     const cachedAlerts = this.Alerts();
       
-    if(cachedAlerts && cachedAlerts.length > 0) {
-        console.log(' Returning alerts from cache');
-        return of(cachedAlerts); 
-    }
+    // if(cachedAlerts && cachedAlerts.length > 0) {
+    //     console.log(' Returning alerts from cache');
+    //     return of(cachedAlerts); 
+    // }
     return this.http.get<Alert[]>(`${this.baseUrl}stock/alerts`).pipe(
     tap(alerts => this.Alerts.set(alerts)) // Cache the result
     );

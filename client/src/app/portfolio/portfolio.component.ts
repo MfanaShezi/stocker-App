@@ -9,11 +9,12 @@ import { StockService } from '../_services/stock.service';
 import { BaseChartDirective } from 'ng2-charts';
 import { stock } from '../_models/stock';
 import { StockAnalysisService } from '../_services/stock-analysis.service';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule,FormsModule,BaseChartDirective],
+  imports: [CommonModule,FormsModule,BaseChartDirective,RouterLink],
   templateUrl: './portfolio.component.html',
   styleUrl: './portfolio.component.css'
 })
@@ -27,6 +28,7 @@ export class PortfolioComponent implements OnInit {
   portfolioService=inject(PortfolioService);
   private stockService = inject(StockService);
   public stockanalysis=inject(StockAnalysisService);
+  router=inject(Router);
 
 
   loading = true;
@@ -534,6 +536,15 @@ sellAllShares(symbol: string, event?: Event) {
         symbol: holding.symbol || 'N/A',
         sharePrice: holding.currentPrice || 0,
       };
+    }
+
+    GetStockDetails(symbol: string): void {
+      for(let stock of this.stockService.stocks() || []){
+        if(stock.symbol.toUpperCase()===symbol.toUpperCase()){
+          this.router.navigate(['/stocks', stock.id]);
+          break;
+        }
+      }
     }
 }
 

@@ -44,6 +44,6 @@ for i in {1..5}; do
 done
 
 echo "===== Deployment completed! ====="
-echo "Your images are now available at:"
+echo "Docker images are now available at:"
 echo "- ${USERNAME}/${REPO}:api"
 echo "- ${USERNAME}/${REPO}:client"

@@ -89,7 +89,14 @@
             </thead>
             <tbody>
               <tr *ngFor="let holding of groupedHoldings" [ngClass]="getRowClass(holding.profitLoss)">
-                <td class="symbol-cell">{{ holding.symbol }}</td>
+                <td class="symbol-cell">
+                  <a 
+                  (click)="GetStockDetails(holding.symbol)"
+                  style="cursor: pointer;"
+                  >
+                  {{ holding.symbol }}
+                  </a>
+                </td>
                 <td class="company-cell">{{ holding.companyName }}</td>
                 <td class="quantity-cell">{{ holding.totalQuantity | number:'1.0-2' }}</td>
                 <td class="price-cell">{{ formatCurrency(holding.averageBuyPrice) }}</td>

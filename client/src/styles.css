@@ -255,9 +255,9 @@ body {
 }
 
 .metric-value {
-  font-size: 2rem;
+  /* font-size: 2rem; */
   font-weight: 700;
-  color: var(--primary-color);
+  /* color: var(--primary-color); */
   margin-bottom: 0.25rem;
 }
 

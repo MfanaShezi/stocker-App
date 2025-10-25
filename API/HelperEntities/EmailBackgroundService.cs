@@ -43,8 +43,8 @@ public class EmailBackgroundService : BackgroundService
 
                     // Process alerts or periodic emails
                     await CheckPriceAlerts(stockRepository, context, emailService);
-                    if (DateTime.Now.DayOfWeek == DayOfWeek.Friday && DateTime.Now.Hour == 10)
-                    {
+                    if (DateTime.Now.DayOfWeek == DayOfWeek.Friday )
+                     {
                         _logger.LogInformation("It's Friday 8AM - time to send weekly summaries");
                         await SendWeeklyPortfolioSummaries(stockRepository, context, emailService);
                     }

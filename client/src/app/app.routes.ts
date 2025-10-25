@@ -12,6 +12,7 @@ import { UserDetailsComponent } from './user-details/user-details.component';
 import { authguardGuard } from './_guards/authguard.guard';
 import { AlertComponent } from './Alerts/alert/alert.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
+import { FinEdComponent } from './fin-ed/fin-ed.component';
 
 export const routes: Routes = 
 [
@@ -31,7 +32,8 @@ export const routes: Routes =
             
             {path: "profile",component:UserDetailsComponent},
             {path: 'alerts', component:AlertComponent },
-            {path:'portfolio',component:PortfolioComponent}
+            {path:'portfolio',component:PortfolioComponent},
+            {path:'fined',component:FinEdComponent}
         ]
     },
     {path:'register',component: RegisterComponent},

@@ -21,10 +21,17 @@
               <input
                 type="text"
                 [(ngModel)]="searchTerm"
+                [disabled]="isSearching"
                 name="searchTerm"
                 placeholder="Search for stocks, ETFs or tickers"
               />
-              <button type="submit"><i class="fa fa-search"></i></button>
+              <button class="btn btn-outline-primary" type="submit" [disabled]="isSearching">
+                <span *ngIf="!isSearching">
+                  <i class="fa fa-search"></i>
+                </span>
+                <span *ngIf="isSearching" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span *ngIf="isSearching" class="ms-1">Searching...</span>
+              </button>
             </form>
 
           
