@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace API.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSqlServe : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,11 +16,11 @@ namespace API.Data.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -30,25 +31,25 @@ namespace API.Data.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    InvestmentStyle = table.Column<int>(type: "int", maxLength: 20, nullable: true),
-                    RiskAppetite = table.Column<int>(type: "int", maxLength: 20, nullable: true),
-                    InvestmentGoal = table.Column<int>(type: "int", maxLength: 50, nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InvestmentStyle = table.Column<int>(type: "integer", maxLength: 20, nullable: true),
+                    RiskAppetite = table.Column<int>(type: "integer", maxLength: 20, nullable: true),
+                    InvestmentGoal = table.Column<int>(type: "integer", maxLength: 50, nullable: true),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -59,13 +60,13 @@ namespace API.Data.Migrations
                 name: "GeneralNews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    PublishDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Source = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    PublishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Source = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,36 +77,36 @@ namespace API.Data.Migrations
                 name: "Stocks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Symbol = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    isETF = table.Column<bool>(type: "bit", nullable: false),
-                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Sector = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Region = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AssetClass = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FundFamily = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExpenseRatio = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    TotalAssets = table.Column<decimal>(type: "decimal(24,2)", precision: 24, scale: 2, nullable: true),
-                    PeRatio = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    DividendYield = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    SharePrice = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: true),
-                    hasDividends = table.Column<bool>(type: "bit", nullable: false),
-                    MarketCap = table.Column<decimal>(type: "decimal(24,2)", precision: 24, scale: 2, nullable: true),
-                    TotalDebt = table.Column<decimal>(type: "decimal(24,2)", precision: 24, scale: 2, nullable: true),
-                    ROE = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    ROA = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    PriceToBook = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    BookValue = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: true),
-                    DividendRate = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    fiftyTwoWeekHigh = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: true),
-                    fiftyTwoWeekLow = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: true),
-                    ChangePercentage = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: true),
-                    Sentiment = table.Column<int>(type: "int", maxLength: 20, nullable: true),
-                    SentimentScore = table.Column<decimal>(type: "decimal(5,4)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Symbol = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    isETF = table.Column<bool>(type: "boolean", nullable: false),
+                    Exchange = table.Column<string>(type: "text", nullable: false),
+                    Category = table.Column<string>(type: "text", nullable: true),
+                    Sector = table.Column<string>(type: "text", nullable: true),
+                    Region = table.Column<string>(type: "text", nullable: true),
+                    AssetClass = table.Column<string>(type: "text", nullable: true),
+                    FundFamily = table.Column<string>(type: "text", nullable: true),
+                    ExpenseRatio = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    TotalAssets = table.Column<decimal>(type: "numeric(24,2)", precision: 24, scale: 2, nullable: true),
+                    PeRatio = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    DividendYield = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    SharePrice = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: true),
+                    hasDividends = table.Column<bool>(type: "boolean", nullable: false),
+                    MarketCap = table.Column<decimal>(type: "numeric(24,2)", precision: 24, scale: 2, nullable: true),
+                    TotalDebt = table.Column<decimal>(type: "numeric(24,2)", precision: 24, scale: 2, nullable: true),
+                    ROE = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    ROA = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    PriceToBook = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    BookValue = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: true),
+                    DividendRate = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    fiftyTwoWeekHigh = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: true),
+                    fiftyTwoWeekLow = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: true),
+                    ChangePercentage = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: true),
+                    Sentiment = table.Column<int>(type: "integer", maxLength: 20, nullable: true),
+                    SentimentScore = table.Column<double>(type: "numeric(5,4)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -117,11 +118,11 @@ namespace API.Data.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<int>(type: "integer", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -138,11 +139,11 @@ namespace API.Data.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -159,10 +160,10 @@ namespace API.Data.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -179,8 +180,8 @@ namespace API.Data.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    RoleId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -203,10 +204,10 @@ namespace API.Data.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -223,15 +224,15 @@ namespace API.Data.Migrations
                 name: "ForumThreads",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastMessageAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    MessageCount = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastMessageAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    MessageCount = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -248,9 +249,9 @@ namespace API.Data.Migrations
                 name: "WatchLists",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -266,15 +267,15 @@ namespace API.Data.Migrations
                 name: "Alerts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    StockId = table.Column<int>(type: "int", nullable: false),
-                    TargetPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    AlertType = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TriggeredAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    StockId = table.Column<int>(type: "integer", nullable: false),
+                    TargetPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    AlertType = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TriggeredAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -297,14 +298,14 @@ namespace API.Data.Migrations
                 name: "Purchases",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StockSymbol = table.Column<string>(type: "nvarchar(10)", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
-                    PurchasePrice = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
-                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PurchaseValue = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StockSymbol = table.Column<string>(type: "character varying(10)", nullable: false),
+                    Quantity = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    PurchasePrice = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    PurchaseDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PurchaseValue = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -327,11 +328,11 @@ namespace API.Data.Migrations
                 name: "StockDividends",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StockId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StockId = table.Column<int>(type: "integer", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -348,12 +349,12 @@ namespace API.Data.Migrations
                 name: "StockNews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StockId = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Link = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Published = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StockId = table.Column<int>(type: "integer", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Link = table.Column<string>(type: "text", nullable: false),
+                    Published = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -370,14 +371,14 @@ namespace API.Data.Migrations
                 name: "StockPrices",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StockId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Open = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
-                    High = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
-                    Low = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
-                    Close = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StockId = table.Column<int>(type: "integer", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Open = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    High = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    Low = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    Close = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
                     Volume = table.Column<long>(type: "bigint", precision: 20, scale: 0, nullable: false)
                 },
                 constraints: table =>
@@ -395,12 +396,12 @@ namespace API.Data.Migrations
                 name: "ForumMessages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ThreadId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ThreadId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -423,8 +424,8 @@ namespace API.Data.Migrations
                 name: "WatchListStocks",
                 columns: table => new
                 {
-                    WatchListId = table.Column<int>(type: "int", nullable: false),
-                    StockId = table.Column<int>(type: "int", nullable: false)
+                    WatchListId = table.Column<int>(type: "integer", nullable: false),
+                    StockId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -449,9 +450,14 @@ namespace API.Data.Migrations
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Alerts_UserId",
+                name: "IX_Alerts_TargetPrice",
                 table: "Alerts",
-                column: "UserId");
+                column: "TargetPrice");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Alerts_UserId_StockId",
+                table: "Alerts",
+                columns: new[] { "UserId", "StockId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -462,8 +468,7 @@ namespace API.Data.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -486,11 +491,20 @@ namespace API.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Email",
+                table: "AspNetUsers",
+                column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_UserName",
+                table: "AspNetUsers",
+                column: "UserName");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ForumMessages_ThreadId",
@@ -501,6 +515,11 @@ namespace API.Data.Migrations
                 name: "IX_ForumMessages_UserId",
                 table: "ForumMessages",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ForumThreads_CreatedAt",
+                table: "ForumThreads",
+                column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ForumThreads_CreatedBy",
@@ -528,16 +547,25 @@ namespace API.Data.Migrations
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockPrices_StockId",
+                name: "IX_StockPrices_StockId_Date",
                 table: "StockPrices",
-                column: "StockId");
+                columns: new[] { "StockId", "Date" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stocks_isETF",
+                table: "Stocks",
+                column: "isETF");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stocks_Symbol",
+                table: "Stocks",
+                column: "Symbol");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WatchLists_UserId",
                 table: "WatchLists",
                 column: "UserId",
-                unique: true,
-                filter: "[UserId] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_WatchListStocks_StockId",

@@ -37,6 +37,9 @@ namespace API.Data
 
         public async Task SeedStocksAsync()
         {
+            if( await _context.Stocks.AnyAsync())
+                return;
+
             Console.WriteLine("seeding stocks");
             // Fetch tradable assets
             var assets = await _alpacaClient.ListAssetsAsync(new AssetsRequest());
@@ -507,6 +510,9 @@ namespace API.Data
         // Method with parallel processing for even better performance
         public async Task FetchAndStoreStockDataParallel()
         {
+            if(_context.StockPrices.Any() )
+                return;
+
             var stocks = await _context.Stocks.Take(200).OrderBy(x => x.Id).ToListAsync(); // Fetch the first 100 stocks
             var semaphore = new SemaphoreSlim(6); // Limit concurrent operations to 5
 
@@ -680,6 +686,9 @@ namespace API.Data
 
         public async Task SeedUsers(UserManager<User> userManager)
         {
+            
+            if(userManager.Users.Any())
+                return;
             // Create 3 users
             var users = new List<User>
             {
@@ -742,6 +751,9 @@ namespace API.Data
 
         public async Task seedWatchlist(UserManager<User> userManager)
         {
+            if(_context.WatchLists.Any())
+                return;
+
              // Fetch 15 random stocks from the database
             var stocks = await _context.Stocks.Take(15).ToListAsync();
 
@@ -790,6 +802,9 @@ namespace API.Data
         // Add this method to your Seed.cs class
         public async Task SeedForumDataAsync()
         {
+            if(await _context.ForumThreads.AnyAsync())
+                     return;
+
             if (await _context.ForumThreads.AnyAsync()) return;
 
             var users = await _context.Users.ToListAsync();
@@ -1165,6 +1180,11 @@ namespace API.Data
 
         public async Task CreateAlertsForUsers()
         {
+            if(await _context.Alerts.AnyAsync())
+            {
+                Console.WriteLine("Alerts already exist, skipping creation.");
+                return;
+            }
             var users = _context.Users.ToList();
             var stocks = _context.Stocks.Take(10).ToList();
 
@@ -1232,6 +1252,9 @@ namespace API.Data
 
         public  async Task SeedPurchases()
         {
+            if(await _context.Purchases.AnyAsync())
+                return; 
+                
             if (await _context.Purchases.AnyAsync())
             {
                 Console.WriteLine("Purchases already exist, skipping seeding.");

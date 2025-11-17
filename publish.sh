@@ -13,7 +13,7 @@ echo "===== Logging out and logging back in to Docker Hub ====="
 docker login
 
 echo "===== Building Docker images ====="
-#docker-compose build
+docker-compose build --no-cache
 
 echo "===== Tagging images for Docker Hub ====="
 docker tag stocker-app-api ${USERNAME}/${REPO}:api

@@ -22,9 +22,15 @@ builder.Services.AddControllers();
 // });
 
 //sql server config
+// builder.Services.AddDbContext<DataContext>(opt =>
+// {
+//     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+// });
+
+//Postgresql Config
 builder.Services.AddDbContext<DataContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddCors();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -39,6 +45,9 @@ builder.Services.Configure<AlpacaSettings>(builder.Configuration.GetSection("Alp
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
+// DB health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<DataContext>();
 
 // Register the Seed class as a service
 builder.Services.AddTransient<Seed>();
@@ -50,7 +59,7 @@ var app = builder.Build();
 //Middleware configuration
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
-.WithOrigins("http://localhost:4200", "https://localhost:4200","http://localhost:80"));
+.WithOrigins("http://localhost:4200", "https://localhost:4200","http://localhost:80","https://stocker-app-client.onrender.com"));
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -60,6 +69,7 @@ app.UseStaticFiles();
 
 app.MapControllers();
 app.MapHub<ForumHub>("/hubs/forumHub");
+app.MapHealthChecks("/health");
 
 // Add Data
 using (var scope = app.Services.CreateScope())
@@ -73,17 +83,16 @@ using (var scope = app.Services.CreateScope())
         db.Database.Migrate();
         var seed = services.GetRequiredService<Seed>();
         Console.WriteLine("starting database seeding");
-        //await seed.SeedUsers(userManager);
-        //await seed.LoadGeneralNews();
-        //await seed.SeedStocksAsync();
-       // await seed.FetchAndStoreStockDataParallel();
-       
-        //await seed.seedWatchlist(userManager); // seedWatchlist
-      //  await seed.SeedUsersAndWatchlists(userManager);*no longer exists
-       // await seed.SeedSentimentParallel();
-       // await seed.SeedForumDataAsync();
-       // await seed.CreateAlertsForUsers();
-       // await seed.SeedPurchases();
+        await seed.SeedUsers(userManager);
+        
+        /// await seed.SeedStocksAsync();
+        //await seed.FetchAndStoreStockDataParallel();
+
+        // await seed.seedWatchlist(userManager); // seedWatchlist
+        //await seed.SeedForumDataAsync();
+        // await seed.CreateAlertsForUsers();
+        // await seed.SeedPurchases();
+
         Console.WriteLine("Seeding completed successfully.\n");
         var seedingState = services.GetRequiredService<SeedingState>();
         seedingState.SetSeedingComplete();
@@ -94,5 +103,13 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+if (app.Environment.IsDevelopment())
+{
+    Console.WriteLine("In Development environment");
+}
+else
+{
+    Console.WriteLine("In Production environment");
+}
 
 app.Run();

@@ -22,6 +22,7 @@
     "logoutlink",
     "mapholdingtostock",
     "Marketaux",
+    "Npgsql",
     "nphf",
     "OPFI",
     "OPRA",
@@ -34,6 +35,7 @@
     "shezi",
     "Sindy",
     "stockanalysis",
+    "stockerdb",
     "stockservice",
     "toastr",
     "userdetails",
@@ -42,5 +44,18 @@
     "watchlists",
     "watchliststocks",
     "xarf"
+  ],
+  "sqltools.connections": [
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "askForPassword": true,
+      "driver": "PostgreSQL",
+      "database": "stockerdb",
+      "username": "postgres",
+      "name": "StockerPostgress"
+    }
   ]
 }

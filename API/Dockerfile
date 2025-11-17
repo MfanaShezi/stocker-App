@@ -18,7 +18,5 @@ COPY --from=publish /app/publish .
 # Install EF tools in final image
 RUN dotnet tool install --global dotnet-ef --version 8.0.5
 ENV PATH="${PATH}:/root/.dotnet/tools"
-# Copy the entrypoint script
-COPY API/entrypoint.sh .
-RUN chmod +x entrypoint.sh
-ENTRYPOINT ["./entrypoint.sh"]
+
+ENTRYPOINT ["dotnet", "API.dll"]

@@ -5,10 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C#: API Debug",
+            "name": "C#: API Debug (Development)",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/API/API.csproj"
+            "projectPath": "${workspaceFolder}/API/API.csproj",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "C#: API Debug (Production)",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/API/API.csproj",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Production"
+            }
         },
         {
             "name": ".NET Core Attach",

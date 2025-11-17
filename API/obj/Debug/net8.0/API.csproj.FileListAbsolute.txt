@@ -41,9 +41,14 @@ C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Entity
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.SqlServer.Abstractions.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.SqlServer.HierarchyId.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite.dll
+C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.HealthChecks.dll
+C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
+C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
+C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Identity.Client.dll
 C:\Users\Student\Documents\git\stocker-App\API\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
