@@ -74,9 +74,12 @@
         },
         "serve": {
           "options": {
-          "ssl": true,
-          "sslCert": "./ssl/localhost.pem",
-          "sslKey": "./ssl/localhost-key.pem"
+          "host": "0.0.0.0",
+          "port": 4200,
+          "allowedHosts": [
+            ".ngrok-free.app",
+            "localhost"
+          ]
           },
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {

@@ -8,8 +8,10 @@
     "cachedwatchliststocks",
     "CANF",
     "casbody",
+    "celhlg",
     "Confimm",
     "createalert",
+    "Dqmfni",
     "Etfs",
     "financials",
     "fontawesome",
@@ -30,6 +32,7 @@
     "PKJXXKY",
     "Portfoliio",
     "Portfoliovalue",
+    "Pvijuh",
     "qfbk",
     "registerables",
     "shareprice",
@@ -57,6 +60,22 @@
       "database": "stockerdb",
       "username": "postgres",
       "name": "StockerPostgress"
+    },
+    {
+      "pgOptions": {
+        "ssl": {
+          "rejectUnauthorized": true
+        }
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "sshOptions": {
+        "port": 22
+      },
+      "server": "localhost",
+      "driver": "PostgreSQL",
+      "name": "renderstockerdb",
+      "connectString": "postgresql://admin:01PvijuhRDqmfni80wa89uRby3S3AuQF@dpg-d4e3ub6mcj7s73celhlg-a.oregon-postgres.render.com/stockerdb"
     }
   ]
 }

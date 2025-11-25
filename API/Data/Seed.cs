@@ -513,7 +513,7 @@ namespace API.Data
             if(_context.StockPrices.Any() )
                 return;
 
-            var stocks = await _context.Stocks.Take(200).OrderBy(x => x.Id).ToListAsync(); // Fetch the first 100 stocks
+            var stocks = await _context.Stocks.Take(20).OrderBy(x => x.Id).ToListAsync(); // Fetch the first 100 stocks
             var semaphore = new SemaphoreSlim(6); // Limit concurrent operations to 5
 
             var allStockPrices = new ConcurrentBag<StockPrice>();

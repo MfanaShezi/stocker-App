@@ -82,16 +82,37 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Applying database migrations programmatically...");
         db.Database.Migrate();
         var seed = services.GetRequiredService<Seed>();
-        Console.WriteLine("starting database seeding");
-        await seed.SeedUsers(userManager);
-        
-        /// await seed.SeedStocksAsync();
-        //await seed.FetchAndStoreStockDataParallel();
+        if (app.Environment.IsDevelopment())
+        {
+            Console.WriteLine("In Development environment");
+            Console.WriteLine("starting database seeding");
+            await seed.SeedUsers(userManager);
 
-        // await seed.seedWatchlist(userManager); // seedWatchlist
-        //await seed.SeedForumDataAsync();
-        // await seed.CreateAlertsForUsers();
-        // await seed.SeedPurchases();
+            //await seed.SeedStocksAsync();
+            //await seed.FetchAndStoreStockDataParallel();
+
+           // await seed.seedWatchlist(userManager); // seedWatchlist
+            //await seed.SeedForumDataAsync();
+           //await seed.CreateAlertsForUsers();
+            //await seed.SeedPurchases();
+
+        }
+        else
+        {
+            Console.WriteLine("In Production environment");
+            Console.WriteLine("starting database seeding");
+            await seed.SeedUsers(userManager);
+
+            await seed.SeedStocksAsync();
+            await seed.FetchAndStoreStockDataParallel();
+
+            await seed.seedWatchlist(userManager); // seedWatchlist
+            await seed.SeedForumDataAsync();
+            await seed.CreateAlertsForUsers();
+            await seed.SeedPurchases();
+
+        }
+
 
         Console.WriteLine("Seeding completed successfully.\n");
         var seedingState = services.GetRequiredService<SeedingState>();
@@ -103,13 +124,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-if (app.Environment.IsDevelopment())
-{
-    Console.WriteLine("In Development environment");
-}
-else
-{
-    Console.WriteLine("In Production environment");
-}
+
 
 app.Run();

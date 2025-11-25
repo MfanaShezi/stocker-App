@@ -10,7 +10,7 @@ RUN cat angular.json | grep outputPath || echo "No outputPath found"
 
 # Build with production configuration
 # Note: flags come AFTER the --, not before
-RUN npm run build -- --configuration production --verbose
+RUN npm run build --  --configuration production --verbose
 
 # Debug: Show what was built
 RUN echo "=== Root directory ===" && ls -la
@@ -29,7 +29,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Try this path - adjust based on build output above
-COPY --from=build /app/dist/client/browser/ .
+COPY --from=build /app/dist/client/ /usr/share/nginx/html/
 
 # Verify files were copied
 RUN echo "=== Nginx html directory ===" && ls -la

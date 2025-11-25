@@ -24,9 +24,9 @@ services:
     container_name: stocker-api
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=sql;Database=StockerApp;User Id=sa;Password=Password@1;TrustServerCertificate=True
+      - ConnectionStrings__DefaultConnection=Host=dpg-d4e3ub6mcj7s73celhlg-a.oregon-postgres.render.com;Port=5432;Database=stockerdb;Username=admin;Password=01PvijuhRDqmfni80wa89uRby3S3AuQF;SSL Mode=Require;Trust Server Certificate=true
     ports:
-      - "5000:8080"
+      - "5052:8080"
     depends_on:
        - postgres
   
